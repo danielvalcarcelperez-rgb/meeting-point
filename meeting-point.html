@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Meeting Point</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-mid: #5DCAA5;
+    --green-dark: #0F6E56;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --red: #D85A30;
+    --red-light: #FAECE7;
+    --blue: #378ADD;
+    --blue-light: #E6F1FB;
+    --gray: #888780;
+    --gray-light: #F1EFE8;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --text-hint: #9b9b9b;
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.2);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  #app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 1.5rem 1.25rem 2rem; animation: fadeIn 0.25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HEADER */
+  .app-header { text-align: center; padding: 2.5rem 0 1.5rem; }
+  .app-logo { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text); letter-spacing: -0.5px; }
+  .app-logo span { color: var(--green); }
+  .app-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; font-weight: 300; }
+
+  /* CARDS */
+  .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+
+  /* INPUTS */
+  label.field-label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; margin-top: 12px; }
+  label.field-label:first-child { margin-top: 0; }
+  input[type=text], input[type=time], input[type=date] {
+    width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--bg);
+    font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+    outline: none; transition: border 0.15s;
+  }
+  input:focus { border-color: var(--green); }
+
+  /* BUTTONS */
+  .btn { display: block; width: 100%; padding: 13px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); transition: all 0.15s; text-align: center; }
+  .btn:hover { background: var(--bg); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+  .btn.primary:hover { background: var(--green-dark); }
+  .btn.sm { width: auto; padding: 7px 14px; font-size: 13px; display: inline-block; }
+  .btn.ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+  .btn.ghost:hover { background: var(--bg); }
+
+  /* DIVIDER */
+  .or-divider { text-align: center; font-size: 13px; color: var(--text-hint); margin: 0.75rem 0; position: relative; }
+  .or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
+  .or-divider::before { left: 0; }
+  .or-divider::after { right: 0; }
+
+  /* PROGRESS */
+  .progress { display: flex; gap: 5px; margin-bottom: 1.5rem; }
+  .progress-dot { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+  .progress-dot.done { background: var(--green); }
+  .progress-dot.active { background: var(--green-mid); }
+
+  /* SECTION HEADER */
+  .section-header { margin-bottom: 1.25rem; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); }
+  .section-sub { font-size: 14px; color: var(--text-muted); margin-top: 3px; font-weight: 300; }
+
+  /* CALENDAR */
+  .cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cal-month { font-size: 15px; font-weight: 500; }
+  .cal-arrow { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px 10px; border-radius: var(--radius-sm); }
+  .cal-arrow:hover { background: var(--bg); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-dn { text-align: center; font-size: 11px; color: var(--text-hint); padding: 4px 0; font-weight: 500; }
+  .cal-day { text-align: center; padding: 9px 3px; border-radius: var(--radius-sm); font-size: 14px; color: var(--text-hint); cursor: pointer; position: relative; transition: all 0.1s; user-select: none; }
+  .cal-day.curr { color: var(--text); }
+  .cal-day.curr:hover { background: var(--bg); }
+  .cal-day.sel { background: var(--green) !important; color: #fff !important; }
+  .cal-day.has-slots::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--amber); }
+  .cal-day.sel::after { background: rgba(255,255,255,0.7); }
+  .cal-day.empty { cursor: default; }
+  .cal-day.today { font-weight: 600; }
+
+  /* SLOTS */
+  .slots-panel { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .slots-panel-title { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-weight: 500; }
+  .time-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .time-row input { flex: 1; margin: 0; }
+  .time-sep { font-size: 13px; color: var(--text-hint); }
+  .pref-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .pref-btn { flex: 1; padding: 7px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-align: center; color: var(--text-muted); transition: all 0.15s; }
+  .pref-btn.active-high { background: var(--green-light); border-color: var(--green-mid); color: var(--green-dark); font-weight: 500; }
+  .pref-btn.active-mid { background: var(--amber-light); border-color: var(--amber); color: #633806; font-weight: 500; }
+  .pref-btn.active-low { background: var(--red-light); border-color: #F0997B; color: #993C1D; font-weight: 500; }
+  .slot-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .slot-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+  .slot-chip.high { background: var(--green-light); color: var(--green-dark); }
+  .slot-chip.mid { background: var(--amber-light); color: #633806; }
+  .slot-chip.low { background: var(--red-light); color: #993C1D; }
+  .slot-chip button { background: none; border: none; cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.7; }
+
+  /* PARTICIPANT CHIPS */
+  .participant-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .participant-row:last-child { border-bottom: none; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .p-info { flex: 1; }
+  .p-name { font-size: 15px; font-weight: 500; }
+  .p-slots { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .p-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
+  .p-status.ok { background: var(--green-light); color: var(--green-dark); }
+  .p-status.pending { background: var(--amber-light); color: #633806; }
+
+  /* SESSION BOX */
+  .session-box { background: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 1rem; }
+  .session-name-display { font-size: 17px; font-weight: 500; }
+  .session-code { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .session-code span { font-family: monospace; color: var(--green); font-weight: 600; font-size: 14px; }
+
+  /* RESULTS */
+  .result-card { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
+  .result-top { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .result-pct { font-size: 26px; font-weight: 600; font-family: 'DM Serif Display', serif; }
+  .result-count { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+  .result-badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+  .result-body { padding: 10px 14px; border-top: 1px solid rgba(0,0,0,0.06); }
+  .result-datetime { font-size: 15px; font-weight: 500; }
+  .result-avatars { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .mini-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; }
+  .result-tip { font-size: 12px; margin-top: 8px; padding: 7px 10px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.04); color: var(--text-muted); }
+  .result-tip::before { content: '💡 '; }
+
+  /* TABS */
+  .tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .tab { flex: 1; padding: 10px 0; text-align: center; font-size: 13px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 500; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* LOADING */
+  .loading { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 14px; }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 14px; }
+  .empty-icon { font-size: 32px; margin-bottom: 0.5rem; }
+
+  /* BACK BTN */
+  .back-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; color: var(--text-muted); cursor: pointer; margin-bottom: 1.25rem; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; }
+  .back-btn:hover { color: var(--text); }
+
+  /* COPY BTN */
+  .copy-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--green); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 2px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SCREEN: Welcome -->
+<div class="screen active" id="s-welcome">
+  <div class="app-header">
+    <div class="app-logo">Meeting <span>Point</span></div>
+    <div class="app-subtitle">Encuentra el mejor momento para reuniros</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Nueva reunión</div>
+    <label class="field-label">Nombre de la reunión</label>
+    <input type="text" id="w-session-name" placeholder="Ej: Reunión de departamento">
+    <label class="field-label">Tu nombre</label>
+    <input type="text" id="w-user-name" placeholder="Escribe tu nombre">
+    <button class="btn primary" style="margin-top:14px;" onclick="createSession()">Crear reunión</button>
+  </div>
+  <div class="or-divider">o</div>
+  <div class="card">
+    <div class="card-title">Unirse a una reunión</div>
+    <label class="field-label">Código de reunión</label>
+    <input type="text" id="w-join-code" placeholder="Ej: AB12CD" style="text-transform:uppercase;">
+    <label class="field-label">Tu nombre</label>
+    <input type="text" id="w-join-name" placeholder="Escribe tu nombre">
+    <button class="btn" style="margin-top:14px;" onclick="joinSession()">Unirse</button>
+  </div>
+</div>
+
+<!-- SCREEN: Calendar -->
+<div class="screen" id="s-calendar">
+  <div class="progress">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot active"></div>
+    <div class="progress-dot"></div>
+  </div>
+  <div class="section-header">
+    <div class="section-title" id="cal-greeting">Tu disponibilidad</div>
+    <div class="section-sub">Selecciona días y añade tus franjas horarias</div>
+  </div>
+  <div class="card">
+    <div class="cal-nav-row">
+      <button class="cal-arrow" onclick="changeMonth(-1)">‹</button>
+      <span class="cal-month" id="cal-label"></span>
+      <button class="cal-arrow" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-dn"></div>
+    <div class="cal-grid" id="cal-days"></div>
+    <div class="slots-panel" id="slots-panel" style="display:none;">
+      <div class="slots-panel-title" id="slots-panel-title">Franjas para este día</div>
+      <div class="time-row">
+        <input type="time" id="t-start" value="09:00">
+        <span class="time-sep">—</span>
+        <input type="time" id="t-end" value="10:00">
+      </div>
+      <div class="pref-row">
+        <button class="pref-btn active-high" onclick="setPref('high')" id="pb-high">Alta</button>
+        <button class="pref-btn" onclick="setPref('mid')" id="pb-mid">Media</button>
+        <button class="pref-btn" onclick="setPref('low')" id="pb-low">Baja</button>
+      </div>
+      <button class="btn sm" onclick="addSlot()" style="margin-bottom:10px;">+ Añadir franja</button>
+      <div class="slot-chips" id="slot-chips"></div>
+    </div>
+  </div>
+  <button class="btn primary" onclick="saveAvailability()">Guardar mi disponibilidad →</button>
+</div>
+
+<!-- SCREEN: Participants -->
+<div class="screen" id="s-participants">
+  <div class="progress">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot active"></div>
+  </div>
+  <div class="section-header">
+    <div class="section-title">Participantes</div>
+    <div class="section-sub" id="part-sub"></div>
+  </div>
+  <div class="card">
+    <div class="session-box">
+      <div class="session-name-display" id="part-session-name"></div>
+      <div class="session-code">Código: <span id="part-code"></span>
+        <button class="copy-btn" onclick="copyCode()">· copiar</button>
+      </div>
+    </div>
+    <div id="participants-list"></div>
+    <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+      <label class="field-label">Invitar a alguien más</label>
+      <input type="text" id="new-p-name" placeholder="Nombre del nuevo participante">
+      <button class="btn sm" style="margin-top:8px;" onclick="addParticipant()">+ Añadir</button>
+    </div>
+  </div>
+  <button class="btn primary" onclick="showResults()">Ver mejores momentos →</button>
+  <button class="btn ghost" style="margin-top:6px;" onclick="editMySlots()">✏️ Editar mi disponibilidad</button>
+</div>
+
+<!-- SCREEN: Results -->
+<div class="screen" id="s-results">
+  <button class="back-btn" onclick="showParticipants()">← Volver</button>
+  <div class="section-header">
+    <div class="section-title">Mejores momentos</div>
+    <div class="section-sub" id="results-sub"></div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" id="tab-rec" onclick="switchTab('rec')">Recomendados</div>
+    <div class="tab" id="tab-all" onclick="switchTab('all')">Todos</div>
+  </div>
+  <div id="results-list"></div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCXV_LiwTWQHDzmHpYhCFA5k27A9xdFYGY",
+  authDomain: "meeting-point-5386a.firebaseapp.com",
+  projectId: "meeting-point-5386a",
+  storageBucket: "meeting-point-5386a.firebasestorage.app",
+  messagingSenderId: "308191293104",
+  appId: "1:308191293104:web:6a624885dbb0d7102c5575"
+};
+
+const firebase = initializeApp(firebaseConfig);
+const db = getFirestore(firebase);
+
+// ── STATE ──────────────────────────────────────────────
+const COLORS = ['#1D9E75','#378ADD','#D4537E','#BA7517','#3C3489','#D85A30','#0F6E56'];
+const BG     = ['#E1F5EE','#E6F1FB','#FBEAF0','#FAEEDA','#EEEDFE','#FAECE7','#E1F5EE'];
+
+let S = {
+  sessionId: null,
+  sessionName: null,
+  myName: null,
+  myIndex: null,
+  participants: [],   // [{name, slots:{dateKey:[{start,end,pref}]}}]
+  calMonth: new Date().getMonth(),
+  calYear:  new Date().getFullYear(),
+  selDate:  null,
+  pref:     'high',
+  unsub:    null,
+  currentTab: 'rec'
+};
+
+// ── HELPERS ─────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function toast(msg, ms=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+function initials(name) {
+  return name.trim().split(' ').map(w=>w[0]||'').join('').substr(0,2).toUpperCase();
+}
+function genId() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+window.copyCode = function() {
+  navigator.clipboard.writeText(S.sessionId).then(()=>toast('Código copiado ✓'));
+};
+
+// ── FIREBASE HELPERS ────────────────────────────────────
+async function saveSession() {
+  await setDoc(doc(db,'sessions', S.sessionId), {
+    name: S.sessionName,
+    participants: S.participants
+  });
+}
+async function loadSession(id) {
+  const snap = await getDoc(doc(db,'sessions',id));
+  return snap.exists() ? snap.data() : null;
+}
+function subscribeSession(id, cb) {
+  if (S.unsub) S.unsub();
+  S.unsub = onSnapshot(doc(db,'sessions',id), snap => {
+    if (snap.exists()) cb(snap.data());
+  });
+}
+
+// ── CREATE / JOIN ────────────────────────────────────────
+window.createSession = async function() {
+  const sName = document.getElementById('w-session-name').value.trim();
+  const uName = document.getElementById('w-user-name').value.trim();
+  if (!sName || !uName) { toast('Rellena todos los campos'); return; }
+  S.sessionId   = genId();
+  S.sessionName = sName;
+  S.myName      = uName;
+  S.myIndex     = 0;
+  S.participants = [{ name: uName, slots: {} }];
+  await saveSession();
+  startCalendar();
+};
+
+window.joinSession = async function() {
+  const code  = document.getElementById('w-join-code').value.trim().toUpperCase();
+  const uName = document.getElementById('w-join-name').value.trim();
+  if (!code || !uName) { toast('Rellena todos los campos'); return; }
+  const data = await loadSession(code);
+  if (!data) { toast('Código no encontrado'); return; }
+  S.sessionId   = code;
+  S.sessionName = data.name;
+  S.participants = data.participants || [];
+  S.myName      = uName;
+  const existing = S.participants.findIndex(p => p.name.toLowerCase() === uName.toLowerCase());
+  if (existing >= 0) {
+    S.myIndex = existing;
+  } else {
+    S.myIndex = S.participants.length;
+    S.participants.push({ name: uName, slots: {} });
+    await saveSession();
+  }
+  startCalendar();
+};
+
+// ── CALENDAR ─────────────────────────────────────────────
+function startCalendar() {
+  document.getElementById('cal-greeting').textContent = 'Hola, ' + S.myName;
+  show('s-calendar');
+  renderCal();
+}
+
+window.changeMonth = function(d) {
+  S.calMonth += d;
+  if (S.calMonth > 11) { S.calMonth = 0; S.calYear++; }
+  if (S.calMonth < 0)  { S.calMonth = 11; S.calYear--; }
+  renderCal();
+};
+
+function renderCal() {
+  const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-label').textContent = MONTHS[S.calMonth] + ' ' + S.calYear;
+  const dn = document.getElementById('cal-dn');
+  dn.innerHTML = '';
+  ['L','M','X','J','V','S','D'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dn'; el.textContent = d; dn.appendChild(el);
+  });
+  const grid = document.getElementById('cal-days');
+  grid.innerHTML = '';
+  const first = new Date(S.calYear, S.calMonth, 1).getDay();
+  const offset = first === 0 ? 6 : first - 1;
+  const days = new Date(S.calYear, S.calMonth+1, 0).getDate();
+  const mySlots = S.participants[S.myIndex]?.slots || {};
+  const today = new Date();
+  for (let i=0; i<offset; i++) {
+    const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
+  }
+  for (let d=1; d<=days; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day curr';
+    el.textContent = d;
+    const key = S.calYear+'-'+String(S.calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if (today.getFullYear()===S.calYear && today.getMonth()===S.calMonth && today.getDate()===d) el.classList.add('today');
+    if (S.selDate === key) el.classList.add('sel');
+    if (mySlots[key] && mySlots[key].length > 0) el.classList.add('has-slots');
+    el.onclick = () => selectDay(key, d);
+    grid.appendChild(el);
+  }
+}
+
+function selectDay(key, d) {
+  S.selDate = key;
+  renderCal();
+  const MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('slots-panel-title').textContent = d+' de '+MONTHS_ES[S.calMonth]+' de '+S.calYear;
+  document.getElementById('slots-panel').style.display = 'block';
+  renderChips();
+}
+
+window.setPref = function(p) {
+  S.pref = p;
+  ['high','mid','low'].forEach(l => {
+    document.getElementById('pb-'+l).className = 'pref-btn' + (l===p ? ' active-'+l : '');
+  });
+};
+
+window.addSlot = function() {
+  const s = document.getElementById('t-start').value;
+  const e = document.getElementById('t-end').value;
+  if (!s || !e || s >= e) { toast('La hora de fin debe ser posterior al inicio'); return; }
+  const p = S.participants[S.myIndex];
+  if (!p.slots[S.selDate]) p.slots[S.selDate] = [];
+  p.slots[S.selDate].push({ start:s, end:e, pref:S.pref });
+  renderCal();
+  renderChips();
+};
+
+window.removeSlot = function(date, idx) {
+  S.participants[S.myIndex].slots[date].splice(idx,1);
+  renderCal();
+  renderChips();
+};
+
+function renderChips() {
+  const slots = S.participants[S.myIndex]?.slots[S.selDate] || [];
+  const cont = document.getElementById('slot-chips');
+  const LABELS = {high:'Alta', mid:'Media', low:'Baja'};
+  cont.innerHTML = slots.map((s,i) =>
+    `<span class="slot-chip ${s.pref}">${s.start}–${s.end} · ${LABELS[s.pref]}<button onclick="removeSlot('${S.selDate}',${i})">×</button></span>`
+  ).join('');
+}
+
+window.saveAvailability = async function() {
+  const mySlots = S.participants[S.myIndex]?.slots || {};
+  const total = Object.values(mySlots).reduce((a,b) => a+b.length, 0);
+  if (total === 0) { toast('Añade al menos una franja antes de continuar'); return; }
+  await saveSession();
+  toast('Disponibilidad guardada ✓');
+  showParticipants();
+};
+
+// ── PARTICIPANTS ──────────────────────────────────────────
+function showParticipants() {
+  subscribeSession(S.sessionId, data => {
+    S.participants = data.participants || [];
+    renderParticipants();
+  });
+  document.getElementById('part-session-name').textContent = S.sessionName;
+  document.getElementById('part-code').textContent = S.sessionId;
+  renderParticipants();
+  show('s-participants');
+}
+window.showParticipants = showParticipants;
+
+function renderParticipants() {
+  const total = S.participants.length;
+  document.getElementById('part-sub').textContent = S.sessionName + ' · ' + total + ' participante(s)';
+  const list = document.getElementById('participants-list');
+  list.innerHTML = S.participants.map((p,i) => {
+    const slots = Object.values(p.slots||{}).reduce((a,b)=>a+b.length,0);
+    const av = initials(p.name);
+    const color = COLORS[i % COLORS.length];
+    const bg    = BG[i % BG.length];
+    const status = slots > 0
+      ? `<span class="p-status ok">${slots} franja(s)</span>`
+      : `<span class="p-status pending">Sin rellenar</span>`;
+    const editBtn = i === S.myIndex ? `<button class="btn sm" onclick="editMySlots()">Editar</button>` : '';
+    return `<div class="participant-row">
+      <div class="avatar" style="background:${bg};color:${color};">${av}</div>
+      <div class="p-info"><div class="p-name">${p.name}${i===S.myIndex?' (tú)':''}</div><div class="p-slots">${slots} franjas añadidas</div></div>
+      ${status}${editBtn}
+    </div>`;
+  }).join('');
+}
+
+window.addParticipant = async function() {
+  const name = document.getElementById('new-p-name').value.trim();
+  if (!name) return;
+  const exists = S.participants.find(p => p.name.toLowerCase()===name.toLowerCase());
+  if (exists) { toast('Ese nombre ya existe'); return; }
+  S.participants.push({ name, slots:{} });
+  await saveSession();
+  document.getElementById('new-p-name').value = '';
+  toast(name + ' añadido/a ✓');
+  renderParticipants();
+};
+
+window.editMySlots = function() {
+  S.selDate = null;
+  document.getElementById('slots-panel').style.display = 'none';
+  startCalendar();
+};
+
+// ── RESULTS ───────────────────────────────────────────────
+let allResults = [];
+
+window.showResults = function() {
+  allResults = computeResults();
+  document.getElementById('results-sub').textContent =
+    S.participants.length + ' participante(s) · ' + allResults.length + ' franja(s) analizadas';
+  S.currentTab = 'rec';
+  document.getElementById('tab-rec').classList.add('active');
+  document.getElementById('tab-all').classList.remove('active');
+  show('s-results');
+  renderResults();
+};
+
+window.switchTab = function(tab) {
+  S.currentTab = tab;
+  document.getElementById('tab-rec').classList.toggle('active', tab==='rec');
+  document.getElementById('tab-all').classList.toggle('active', tab==='all');
+  renderResults();
+};
+
+function computeResults() {
+  const map = {};
+  const PREF = {high:3, mid:2, low:1};
+  S.participants.forEach((p,pi) => {
+    Object.entries(p.slots||{}).forEach(([date,slots]) => {
+      slots.forEach(slot => {
+        const key = date+'|'+slot.start+'|'+slot.end;
+        if (!map[key]) map[key] = [];
+        map[key].push({ p, pi, pref:slot.pref });
+      });
+    });
+  });
+  const total = S.participants.length;
+  return Object.entries(map).map(([key,entries]) => {
+    const [date,start,end] = key.split('|');
+    const score = entries.reduce((s,e)=>s+PREF[e.pref],0);
+    const pct   = Math.round(entries.length/total*100);
+    const avg   = score/entries.length;
+    let cat, catLabel, bg, text, badgeBg, badgeText;
+    if (pct===100 && avg>=2.5)       { cat=5; catLabel='Ideal';     bg='#E1F5EE'; text='#0F6E56'; badgeBg='#1D9E75'; badgeText='#fff'; }
+    else if (pct>=75 && avg>=2)      { cat=4; catLabel='Muy bueno'; bg='#EAF3DE'; text='#27500A'; badgeBg='#639922'; badgeText='#fff'; }
+    else if (pct>=50 && avg>=1.5)    { cat=3; catLabel='Bueno';     bg='#FAEEDA'; text='#633806'; badgeBg='#EF9F27'; badgeText='#fff'; }
+    else if (pct>=33)                { cat=2; catLabel='Regular';   bg='#FAECE7'; text='#993C1D'; badgeBg='#D85A30'; badgeText='#fff'; }
+    else                             { cat=1; catLabel='Limitado';  bg='#F1EFE8'; text='#5F5E5A'; badgeBg='#888780'; badgeText='#fff'; }
+    const absent = S.participants.filter((_,i) => !entries.find(e=>e.pi===i));
+    const tips = [];
+    if (absent.length>0 && absent.length<=2) tips.push('Falta(n): '+absent.map(a=>a.name).join(', ')+'. Consúltales si pueden ajustar.');
+    const [h] = start.split(':').map(Number);
+    if (h>=15 && entries.length<total) tips.push('Una franja matutina equivalente podría sumar más asistentes.');
+    if (h>=9 && h<=11 && entries.length<total) tips.push('Prueba a ampliar 30 min. para incluir a más personas.');
+    return { date, start, end, entries, score, pct, cat, catLabel, bg, text, badgeBg, badgeText, tips };
+  }).sort((a,b)=>b.cat-a.cat||b.pct-a.pct||b.score-a.score);
+}
+
+function formatDate(d) {
+  const [y,m,dd] = d.split('-');
+  const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return dd+' '+M[parseInt(m)-1]+' '+y;
+}
+
+function renderResults() {
+  const list = document.getElementById('results-list');
+  const filtered = S.currentTab==='rec' ? allResults.filter(r=>r.cat>=3) : allResults;
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>No hay momentos con suficiente disponibilidad compartida aún.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(r => {
+    const avatars = r.entries.map(e => {
+      const av = initials(e.p.name);
+      const color = COLORS[e.pi % COLORS.length];
+      const bg    = BG[e.pi % BG.length];
+      return `<div class="mini-av" style="background:${bg};color:${color};">${av}</div>`;
+    }).join('');
+    const tip = r.tips.length ? `<div class="result-tip">${r.tips[0]}</div>` : '';
+    return `<div class="result-card">
+      <div class="result-top" style="background:${r.bg};">
+        <div>
+          <div class="result-pct" style="color:${r.text};">${r.pct}%</div>
+          <div class="result-count" style="color:${r.text};">${r.entries.length} de ${S.participants.length} personas</div>
+        </div>
+        <span class="result-badge" style="background:${r.badgeBg};color:${r.badgeText};">${r.catLabel}</span>
+      </div>
+      <div class="result-body">
+        <div class="result-datetime">${formatDate(r.date)} · ${r.start}–${r.end}</div>
+        <div class="result-avatars">${avatars}</div>
+        ${tip}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+</script>
+</body>
+</html>
