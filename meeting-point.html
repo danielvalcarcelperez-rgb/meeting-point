@@ -2,940 +2,566 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>meetPoint — Encuentra tu momento</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Meeting Point</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --c-bg: #F7F6F2;
-    --c-surface: #FFFFFF;
-    --c-border: rgba(0,0,0,0.08);
-    --c-border-md: rgba(0,0,0,0.14);
-    --c-text: #1A1917;
-    --c-text-2: #6B6965;
-    --c-text-3: #A09D99;
-    --c-accent: #2E6BE6;
-    --c-accent-light: #EBF1FD;
-    --c-accent-dark: #1A4BA8;
-    --c-green: #1D7A4B;
-    --c-green-light: #E8F5EF;
-    --c-amber: #C47A15;
-    --c-amber-light: #FEF4E1;
-    --c-red: #C03434;
-    --c-red-light: #FCEAEA;
-    --c-purple: #5A3FBD;
-    --c-purple-light: #EDEAF9;
-    --radius: 14px;
-    --radius-sm: 8px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--c-bg);
-    color: var(--c-text);
-    min-height: 100vh;
-    padding-bottom: 32px;
-  }
-
-  h1, h2, h3, .display { font-family: 'Sora', sans-serif; }
-
-  /* HEADER */
-  .app-header {
-    background: var(--c-surface);
-    border-bottom: 1px solid var(--c-border);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo-mark {
-    width: 36px; height: 36px;
-    background: var(--c-accent);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Sora', sans-serif;
-    font-weight: 700; font-size: 16px; color: white;
-  }
-  .app-title { font-size: 18px; font-weight: 700; line-height: 1; }
-  .app-subtitle { font-size: 12px; color: var(--c-text-2); margin-top: 2px; }
-
-  /* STEPPER */
-  .stepper {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .stepper::-webkit-scrollbar { display: none; }
-  .step-item {
-    display: flex; align-items: center; gap: 6px;
-    flex-shrink: 0;
-  }
-  .step-dot {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--c-surface);
-    border: 1.5px solid var(--c-border-md);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: var(--c-text-2);
-    font-family: 'Sora', sans-serif;
-    transition: all 0.25s;
-  }
-  .step-dot.active { background: var(--c-accent); border-color: var(--c-accent); color: white; }
-  .step-dot.done { background: var(--c-green); border-color: var(--c-green); color: white; }
-  .step-label { font-size: 12px; color: var(--c-text-2); font-weight: 500; white-space: nowrap; }
-  .step-label.active { color: var(--c-accent); font-weight: 600; }
-  .step-connector { width: 20px; height: 1.5px; background: var(--c-border-md); margin: 0 4px; flex-shrink: 0; }
-  .step-connector.done { background: var(--c-green); }
-
-  /* MAIN CONTENT */
-  .screen { display: none; padding: 0 16px; }
-  .screen.active { display: block; }
-
-  /* CARDS */
-  .card {
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow);
-  }
-  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .card-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-
-  /* BUTTONS */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 12px 20px;
-    border-radius: var(--radius-sm);
-    font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif;
-    border: none; cursor: pointer;
-    transition: all 0.18s; user-select: none;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--c-accent); color: white; }
-  .btn-primary:hover { background: var(--c-accent-dark); }
-  .btn-secondary { background: var(--c-surface); color: var(--c-text); border: 1.5px solid var(--c-border-md); }
-  .btn-secondary:hover { background: var(--c-bg); }
-  .btn-danger { background: var(--c-red-light); color: var(--c-red); }
-  .btn-green { background: var(--c-green); color: white; }
-  .btn-green:hover { background: #155D38; }
-  .btn-full { width: 100%; }
-  .btn-sm { padding: 8px 14px; font-size: 13px; }
-
-  /* INPUTS */
-  input[type="text"], input[type="date"], input[type="time"], select {
-    width: 100%; padding: 11px 14px;
-    border: 1.5px solid var(--c-border-md);
-    border-radius: var(--radius-sm);
-    font-size: 15px; font-family: 'DM Sans', sans-serif;
-    color: var(--c-text);
-    background: var(--c-surface);
-    outline: none;
-    transition: border-color 0.18s;
-    -webkit-appearance: none;
-  }
-  input:focus, select:focus { border-color: var(--c-accent); }
-  label { font-size: 13px; font-weight: 500; color: var(--c-text-2); display: block; margin-bottom: 6px; }
-
-  /* TAGS / BADGES */
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 10px; border-radius: 999px;
-    font-size: 12px; font-weight: 600;
-  }
-  .badge-green { background: var(--c-green-light); color: var(--c-green); }
-  .badge-amber { background: var(--c-amber-light); color: var(--c-amber); }
-  .badge-red { background: var(--c-red-light); color: var(--c-red); }
-  .badge-blue { background: var(--c-accent-light); color: var(--c-accent-dark); }
-  .badge-purple { background: var(--c-purple-light); color: var(--c-purple); }
-
-  /* USER CHIPS */
-  .user-chip {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 14px 8px 8px;
-    background: var(--c-bg);
-    border: 1px solid var(--c-border);
-    border-radius: 999px;
-    margin: 4px;
-    font-size: 14px; font-weight: 500;
-  }
-  .user-avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; font-family: 'Sora', sans-serif;
-    flex-shrink: 0;
-  }
-  .remove-btn { cursor: pointer; color: var(--c-text-3); font-size: 16px; line-height: 1; padding: 0 2px; }
-  .remove-btn:hover { color: var(--c-red); }
-
-  /* AVAILABILITY SLOTS */
-  .slot-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px;
-    background: var(--c-bg);
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-  }
-  .slot-user-dot {
-    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-  }
-  .slot-time { font-size: 14px; font-weight: 600; }
-  .slot-date { font-size: 12px; color: var(--c-text-2); }
-  .slot-pref { margin-left: auto; }
-
-  /* PREF STARS */
-  .stars { display: flex; gap: 3px; }
-  .star { font-size: 16px; cursor: pointer; transition: transform 0.1s; }
-  .star:active { transform: scale(1.3); }
-
-  /* RESULTS */
-  .result-card {
-    background: var(--c-surface);
-    border: 1.5px solid var(--c-border);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .result-card:hover { border-color: var(--c-accent); box-shadow: var(--shadow-lg); }
-  .result-card.selected { border-color: var(--c-accent); background: var(--c-accent-light); }
-  .result-card.best::before {
-    content: 'MEJOR OPCIÓN';
-    position: absolute; top: 0; right: 0;
-    background: var(--c-accent); color: white;
-    font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
-    padding: 4px 12px;
-    border-bottom-left-radius: var(--radius-sm);
-    font-family: 'Sora', sans-serif;
-  }
-  .result-time { font-size: 20px; font-weight: 700; font-family: 'Sora', sans-serif; }
-  .result-date { font-size: 13px; color: var(--c-text-2); margin-bottom: 10px; }
-  .result-bar-wrap { background: var(--c-bg); border-radius: 999px; height: 8px; margin: 8px 0; overflow: hidden; }
-  .result-bar { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
-  .result-users { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .result-user-pill {
-    display: flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 999px;
-    font-size: 12px; font-weight: 500;
-    background: var(--c-bg);
-    border: 1px solid var(--c-border);
-  }
-  .result-user-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .absent-pill { opacity: 0.45; text-decoration: line-through; }
-
-  /* SCORE METER */
-  .score-ring {
-    width: 56px; height: 56px; flex-shrink: 0;
-    position: relative;
-  }
-  .score-ring svg { transform: rotate(-90deg); }
-  .score-val {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; font-family: 'Sora', sans-serif;
-  }
-
-  /* ADVICE BOX */
-  .advice-box {
-    background: var(--c-amber-light);
-    border: 1px solid rgba(196,122,21,0.2);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    margin-top: 8px;
-    font-size: 13px;
-    color: #7A4A08;
-    line-height: 1.6;
-  }
-  .advice-box strong { font-weight: 600; }
-
-  /* CALENDAR OPTIONS */
-  .cal-option {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px;
-    background: var(--c-surface);
-    border: 1.5px solid var(--c-border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: all 0.18s;
-    text-decoration: none;
-    color: var(--c-text);
-  }
-  .cal-option:hover { border-color: var(--c-accent); }
-  .cal-logo { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-
-  /* MISC */
-  .divider { height: 1px; background: var(--c-border); margin: 16px 0; }
-  .screen-title { font-size: 22px; font-weight: 700; font-family: 'Sora', sans-serif; margin-bottom: 4px; }
-  .screen-desc { font-size: 14px; color: var(--c-text-2); margin-bottom: 20px; line-height: 1.5; }
-  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--c-text-3); text-transform: uppercase; font-family: 'Sora', sans-serif; margin: 20px 0 10px; }
-  .empty-state { text-align: center; padding: 28px 16px; color: var(--c-text-2); }
-  .empty-icon { font-size: 36px; margin-bottom: 10px; }
-  .empty-state p { font-size: 14px; line-height: 1.6; }
-  .tip-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--c-accent-light); color: var(--c-accent-dark); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; margin-bottom: 14px; }
-  .row { display: flex; gap: 10px; }
-  .row > * { flex: 1; }
-  .mt-8 { margin-top: 8px; }
-  .mt-14 { margin-top: 14px; }
-  .mt-20 { margin-top: 20px; }
-  .nav-bar { position: sticky; bottom: 0; background: var(--c-surface); border-top: 1px solid var(--c-border); padding: 12px 16px; display: flex; gap: 10px; z-index: 50; }
-
-  /* TOAST */
-  #toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--c-text); color: white;
-    padding: 10px 20px; border-radius: 999px;
-    font-size: 13px; font-weight: 500;
-    opacity: 0; transition: all 0.3s; pointer-events: none;
-    z-index: 999; white-space: nowrap;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* Pref radio */
-  .pref-row { display: flex; gap: 6px; margin-top: 6px; }
-  .pref-btn {
-    flex: 1; padding: 7px 4px; border-radius: var(--radius-sm);
-    border: 1.5px solid var(--c-border-md);
-    font-size: 12px; font-weight: 600; text-align: center;
-    cursor: pointer; transition: all 0.18s;
-    background: var(--c-surface); color: var(--c-text-2);
-  }
-  .pref-btn.active-1 { border-color: #C03434; background: #FCEAEA; color: #C03434; }
-  .pref-btn.active-2 { border-color: var(--c-amber); background: var(--c-amber-light); color: var(--c-amber); }
-  .pref-btn.active-3 { border-color: var(--c-green); background: var(--c-green-light); color: var(--c-green); }
-
-  /* confirm modal */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-    display: none; align-items: flex-end; justify-content: center;
-    z-index: 200;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    background: var(--c-surface);
-    border-radius: 20px 20px 0 0;
-    padding: 24px 20px;
-    width: 100%; max-width: 500px;
-    animation: slideUp 0.28s ease;
-  }
-  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-  .avatar-colors {
-    --av0: #2E6BE6; --av1: #1D7A4B; --av2: #C47A15; --av3: #C03434;
-    --av4: #5A3FBD; --av5: #0F7B8C; --av6: #8C4F0F; --av7: #3B6D11;
-  }
+:root {
+  --green:#1D9E75; --green-l:#E1F5EE; --green-d:#0F6E56; --green-m:#5DCAA5;
+  --amber:#EF9F27; --amber-l:#FAEEDA; --amber-d:#633806;
+  --red:#D85A30; --red-l:#FAECE7; --red-d:#993C1D;
+  --blue:#378ADD; --blue-l:#E6F1FB; --blue-d:#0C447C;
+  --lime:#639922; --lime-l:#EAF3DE; --lime-d:#27500A;
+  --text:#111; --text-2:#555; --text-3:#999;
+  --bg:#F5F4F1; --surface:#fff; --border:rgba(0,0,0,0.09); --border-s:rgba(0,0,0,0.18);
+  --r:16px; --r-s:10px; --r-xs:6px;
+  --shadow:0 2px 12px rgba(0,0,0,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+#app{max-width:480px;margin:0 auto;min-height:100vh}
+.scr{display:none;padding:1.25rem 1.1rem 5rem;animation:up .22s ease}
+.scr.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 0 0}
+.logo{font-size:18px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+.logo span{color:var(--green)}
+.topbar-right{font-size:12px;color:var(--text-3);font-weight:500}
+.steps{display:flex;align-items:center;gap:4px;padding:1rem 0 0}
+.step-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-3);font-weight:500}
+.step-item.done .step-dot{background:var(--green);border-color:var(--green)}
+.step-item.done .step-label{color:var(--green)}
+.step-item.active .step-dot{background:var(--green);border-color:var(--green);box-shadow:0 0 0 3px var(--green-l)}
+.step-item.active .step-label{color:var(--text);font-weight:700}
+.step-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--border-s);background:transparent;transition:all .2s}
+.step-sep{flex:1;height:1px;background:var(--border);max-width:20px}
+.ph{padding:1.5rem 0 1rem}
+.ph-title{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
+.ph-title span{color:var(--green)}
+.ph-sub{font-size:14px;color:var(--text-2);margin-top:5px;font-weight:400;line-height:1.5}
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:1.2rem;margin-bottom:.9rem;box-shadow:var(--shadow)}
+.card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:.9rem}
+.field{margin-bottom:.9rem}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+input[type=text],input[type=time]{width:100%;padding:11px 13px;border-radius:var(--r-s);border:1.5px solid var(--border-s);background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border .15s}
+input:focus{border-color:var(--green);background:var(--surface)}
+input::placeholder{color:var(--text-3)}
+.btn{display:block;width:100%;padding:13px 16px;border-radius:var(--r-s);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:1.5px solid var(--border-s);background:var(--surface);color:var(--text);transition:all .15s;text-align:center;line-height:1}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.primary:hover{background:var(--green-d)}
+.btn.outline{background:transparent;border-color:var(--green);color:var(--green)}
+.btn.outline:hover{background:var(--green-l)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+.btn.ghost:hover{background:var(--bg)}
+.btn.sm{width:auto;padding:7px 13px;font-size:13px;display:inline-block}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:10px;margin:.6rem 0;color:var(--text-3);font-size:13px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.hero{background:linear-gradient(135deg,var(--green-d),var(--green));border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1rem;color:#fff;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-20px;top:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;margin-bottom:10px;letter-spacing:.05em}
+.hero-title{font-size:24px;font-weight:700;letter-spacing:-.5px;position:relative;line-height:1.3}
+.hero-sub{font-size:13px;opacity:.85;margin-top:6px;line-height:1.5;position:relative}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-month{font-size:15px;font-weight:700}
+.cal-arr{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-2);padding:2px 8px;border-radius:var(--r-xs);line-height:1}
+.cal-arr:hover{background:var(--bg)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dn{text-align:center;font-size:11px;font-weight:700;color:var(--text-3);padding:4px 0}
+.cal-d{text-align:center;padding:8px 2px;border-radius:var(--r-xs);font-size:14px;color:var(--text-3);cursor:pointer;position:relative;transition:all .1s;user-select:none;font-weight:400}
+.cal-d.curr{color:var(--text);font-weight:500}
+.cal-d.curr:hover{background:var(--bg)}
+.cal-d.sel{background:var(--green)!important;color:#fff!important;font-weight:700}
+.cal-d.has::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--amber)}
+.cal-d.sel::after{background:rgba(255,255,255,.8)}
+.cal-d.today{font-weight:700}
+.cal-d.empty,.cal-d.past{cursor:default;color:var(--text-3);opacity:.35}
+.slots-panel{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.slots-date{font-size:14px;font-weight:700;margin-bottom:10px}
+.time-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.time-row input{flex:1;margin:0}
+.time-sep{font-size:14px;color:var(--text-3);font-weight:600}
+.pref-row{display:flex;gap:6px;margin-bottom:10px}
+.pb{flex:1;padding:8px 4px;border-radius:var(--r-xs);border:1.5px solid var(--border-s);background:var(--bg);font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;text-align:center;color:var(--text-2);font-weight:500;transition:all .15s}
+.pb.h{background:var(--green-l);border-color:var(--green-m);color:var(--green-d)}
+.pb.m{background:var(--amber-l);border-color:var(--amber);color:var(--amber-d)}
+.pb.l{background:var(--red-l);border-color:var(--red);color:var(--red-d)}
+.chip-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.chip.high{background:var(--green-l);color:var(--green-d)}
+.chip.mid{background:var(--amber-l);color:var(--amber-d)}
+.chip.low{background:var(--red-l);color:var(--red-d)}
+.chip button{background:none;border:none;cursor:pointer;font-size:15px;line-height:1;opacity:.6;padding:0}
+.info-box{background:var(--blue-l);border:1px solid rgba(55,138,221,.2);border-radius:var(--r-xs);padding:10px 13px;font-size:13px;color:var(--blue-d);margin-bottom:.9rem;line-height:1.5}
+.p-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.p-row:last-child{border-bottom:none}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.p-info{flex:1}
+.p-name{font-size:15px;font-weight:600}
+.p-detail{font-size:12px;color:var(--text-2);margin-top:2px}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;flex-shrink:0}
+.badge.ok{background:var(--green-l);color:var(--green-d)}
+.badge.pending{background:var(--amber-l);color:var(--amber-d)}
+.sess-box{background:linear-gradient(135deg,var(--green-l),#fff);border-radius:var(--r-s);padding:14px 16px;margin-bottom:1rem;border:1px solid var(--green-m)}
+.sess-name{font-size:17px;font-weight:700;color:var(--green-d)}
+.sess-code-row{display:flex;align-items:center;gap:8px;margin-top:5px}
+.sess-code{font-size:24px;font-weight:700;font-family:monospace;color:var(--green);letter-spacing:4px}
+.copy-btn{background:var(--green);border:none;color:#fff;border-radius:var(--r-xs);padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.share-hint{font-size:12px;color:var(--green-d);margin-top:5px;opacity:.8;line-height:1.4}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1rem}
+.tab{flex:1;padding:10px 0;text-align:center;font-size:13px;font-weight:600;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab.on{color:var(--green);border-bottom-color:var(--green)}
+.res-card{border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow);transition:transform .15s}
+.res-card.final-pick{border:2px solid var(--green);box-shadow:0 4px 20px rgba(29,158,117,.18)}
+.res-top{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.res-pct{font-size:28px;font-weight:700;letter-spacing:-1px}
+.res-count{font-size:12px;opacity:.75;margin-top:1px}
+.res-badge{font-size:11px;padding:4px 11px;border-radius:20px;font-weight:700}
+.res-body{padding:11px 14px;border-top:1px solid rgba(0,0,0,.06)}
+.res-datetime{font-size:15px;font-weight:700;text-transform:capitalize}
+.res-overlap{font-size:13px;color:var(--text-2);margin-top:3px;font-weight:500}
+.mini-avs{display:flex;gap:3px;margin-top:7px;flex-wrap:wrap}
+.mav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.res-tip{font-size:12px;margin-top:8px;padding:7px 10px;border-radius:var(--r-xs);color:var(--text-2);line-height:1.4}
+.res-absent-tip{background:#fff8e1;border:1px solid #ffe082}
+.res-advice-tip{background:var(--bg)}
+.res-actions{padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.final-banner{background:var(--green);color:#fff;padding:8px 14px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700}
+.confirmed-box{background:var(--green-l);border:1.5px solid var(--green-m);border-radius:var(--r);padding:16px;margin-bottom:1rem;text-align:center}
+.confirmed-icon{font-size:36px;margin-bottom:8px}
+.confirmed-title{font-size:18px;font-weight:700;color:var(--green-d)}
+.confirmed-dt{font-size:15px;font-weight:600;color:var(--text);margin-top:4px;text-transform:capitalize}
+.confirmed-sub{font-size:13px;color:var(--text-2);margin-top:3px}
+.cal-btns{display:flex;gap:8px;margin-top:12px}
+.cal-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;border-radius:var(--r-xs);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border-s);background:var(--surface);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;transition:all .15s}
+.cal-btn:hover{background:var(--bg)}
+.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer;background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;padding:0;margin-bottom:1rem}
+.back:hover{color:var(--text)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;transition:transform .3s;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text-2);font-size:14px;line-height:1.6}
+.empty-icon{font-size:40px;margin-bottom:.5rem}
 </style>
 </head>
-<body class="avatar-colors">
+<body>
+<div id="app">
 
-<!-- HEADER -->
-<div class="app-header">
-  <div class="logo-mark">CH</div>
+<!-- WELCOME -->
+<div class="scr on" id="s-welcome">
+  <div style="padding:1rem 1.1rem 0;display:flex;justify-content:space-between;align-items:center">
+    <div class="logo">Meeting<span>Point</span></div>
+  </div>
+  <div style="padding:1.25rem 1.1rem 1rem">
+    <div class="hero">
+      <div class="hero-badge">COORDINADOR DE REUNIONES</div>
+      <div class="hero-title">Encuentra el momento perfecto para reuniros</div>
+      <div class="hero-sub">Cada persona marca su disponibilidad y la app cruza los horarios automáticamente</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Crear nueva reunión</div>
+      <div class="field"><label>Nombre de la reunión</label><input type="text" id="w-sname" placeholder="Ej: Reunión de departamento"></div>
+      <div class="field"><label>Tu nombre</label><input type="text" id="w-uname" placeholder="Ej: Daniel"></div>
+      <button class="btn primary" onclick="createSession()" style="margin-top:4px">Crear reunión →</button>
+    </div>
+    <div class="divider">o únete a una ya creada</div>
+    <div class="card">
+      <div class="card-label">Unirse con código</div>
+      <div class="field"><label>Código de reunión</label><input type="text" id="w-code" placeholder="AB12CD" style="text-transform:uppercase;letter-spacing:4px;font-weight:700;font-size:20px;text-align:center"></div>
+      <div class="field"><label>Tu nombre</label><input type="text" id="w-jname" placeholder="Ej: Ana"></div>
+      <button class="btn outline" onclick="joinSession()">Unirse →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="scr" id="s-calendar">
+  <div class="topbar"><div class="logo">Meeting<span>Point</span></div><div class="topbar-right" id="cal-sess-lbl"></div></div>
+  <div class="steps" id="steps-cal"></div>
+  <div style="padding:0">
+    <div class="ph"><div class="ph-title" id="cal-title">Tu disponibilidad</div><div class="ph-sub">Toca los días en que puedes reunirte y añade franjas horarias</div></div>
+    <div class="card">
+      <div class="cal-nav">
+        <button class="cal-arr" onclick="chMonth(-1)">‹</button>
+        <span class="cal-month" id="cal-lbl"></span>
+        <button class="cal-arr" onclick="chMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="cal-dn"></div>
+      <div class="cal-grid" id="cal-days"></div>
+      <div id="slots-wrap" style="display:none">
+        <div class="slots-panel">
+          <div class="slots-date" id="slots-date-lbl"></div>
+          <div class="time-row">
+            <input type="time" id="t-s" value="09:00">
+            <span class="time-sep">—</span>
+            <input type="time" id="t-e" value="10:00">
+          </div>
+          <div class="pref-row">
+            <button class="pb h" id="pb-h" onclick="setPref('high')">✓ Alta</button>
+            <button class="pb" id="pb-m" onclick="setPref('mid')">Media</button>
+            <button class="pb" id="pb-l" onclick="setPref('low')">Baja</button>
+          </div>
+          <button class="btn sm outline" onclick="addSlot()">+ Añadir franja</button>
+          <div class="chip-list" id="chip-list" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box">💡 <strong>Preferencia:</strong> Alta = me viene perfecto · Media = puedo · Baja = si no hay otra opción</div>
+    <button class="btn primary" onclick="saveAvail()">Guardar mi disponibilidad →</button>
+    <button class="btn ghost" style="margin-top:6px" onclick="goToParticipants()">Continuar sin guardar</button>
+  </div>
+</div>
+
+<!-- PARTICIPANTS -->
+<div class="scr" id="s-participants">
+  <div class="topbar"><div class="logo">Meeting<span>Point</span></div></div>
+  <div class="steps" id="steps-part"></div>
   <div>
-    <div class="app-title">meetPoint</div>
-    <div class="app-subtitle">Encuentra el momento perfecto</div>
-  </div>
-</div>
-
-<!-- STEPPER -->
-<div class="stepper" id="stepper">
-  <div class="step-item">
-    <div class="step-dot active" id="dot-1">1</div>
-    <div class="step-label active" id="lbl-1">Participantes</div>
-  </div>
-  <div class="step-connector" id="con-1"></div>
-  <div class="step-item">
-    <div class="step-dot" id="dot-2">2</div>
-    <div class="step-label" id="lbl-2">Disponibilidad</div>
-  </div>
-  <div class="step-connector" id="con-2"></div>
-  <div class="step-item">
-    <div class="step-dot" id="dot-3">3</div>
-    <div class="step-label" id="lbl-3">Resultados</div>
-  </div>
-  <div class="step-connector" id="con-3"></div>
-  <div class="step-item">
-    <div class="step-dot" id="dot-4">4</div>
-    <div class="step-label" id="lbl-4">Confirmar</div>
-  </div>
-</div>
-
-<!-- SCREEN 1: PARTICIPANTS -->
-<div class="screen active" id="screen-1">
-  <div class="screen-title">¿Quién participa?</div>
-  <div class="screen-desc">Añade los nombres de todas las personas que quieres coordinar.</div>
-
-  <div class="tip-pill">💡 Mínimo 2 personas para cruzar horarios</div>
-
-  <div class="card">
-    <label>Nombre del participante</label>
-    <div class="row">
-      <input type="text" id="user-input" placeholder="Ej: María García" maxlength="30" />
-      <button class="btn btn-primary" style="flex:0;white-space:nowrap" onclick="addUser()">+ Añadir</button>
-    </div>
-  </div>
-
-  <div class="section-label">Lista de participantes</div>
-  <div id="users-list">
-    <div class="empty-state">
-      <div class="empty-icon">👥</div>
-      <p>Aún no hay participantes.<br>Añade al menos 2 personas para continuar.</p>
-    </div>
-  </div>
-</div>
-
-<!-- SCREEN 2: AVAILABILITY -->
-<div class="screen" id="screen-2">
-  <div class="screen-title">¿Cuándo puedes?</div>
-  <div class="screen-desc">Indica los momentos en que <strong id="current-user-name">tú</strong> tienes disponibilidad, y tu preferencia por cada uno.</div>
-
-  <div id="user-progress-bar" style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;"></div>
-
-  <div class="card">
-    <div class="card-title">
-      <div class="card-icon" id="slot-user-icon" style="background:#EBF1FD;color:#2E6BE6">📅</div>
-      <span id="slot-user-label">Añadir franja horaria</span>
-    </div>
-
-    <label>Fecha</label>
-    <input type="date" id="slot-date" style="margin-bottom:12px" />
-
-    <div class="row" style="margin-bottom:12px">
-      <div>
-        <label>Desde</label>
-        <input type="time" id="slot-from" value="09:00" />
+    <div class="ph"><div class="ph-title">Participantes</div><div class="ph-sub" id="part-sub">Comparte el código para que los demás se unan desde sus móviles</div></div>
+    <div class="sess-box">
+      <div class="sess-name" id="part-sname"></div>
+      <div class="sess-code-row">
+        <div class="sess-code" id="part-code"></div>
+        <button class="copy-btn" onclick="copyCode()">Copiar</button>
       </div>
-      <div>
-        <label>Hasta</label>
-        <input type="time" id="slot-to" value="11:00" />
+      <div class="share-hint">📲 Comparte este código con los demás para que entren desde sus móviles</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Quién participa</div>
+      <div id="part-list"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="field" style="margin-bottom:8px"><label>Añadir participante manualmente</label><input type="text" id="new-p" placeholder="Nombre completo"></div>
+        <button class="btn sm outline" onclick="addParticipant()">+ Añadir</button>
       </div>
     </div>
-
-    <label>Preferencia por este momento</label>
-    <div class="pref-row" id="pref-row">
-      <div class="pref-btn" onclick="setPref(1)">😐 Puede ser</div>
-      <div class="pref-btn" onclick="setPref(2)">🙂 Me va bien</div>
-      <div class="pref-btn" onclick="setPref(3)">😄 ¡Perfecto!</div>
-    </div>
-
-    <button class="btn btn-primary btn-full mt-14" onclick="addSlot()">+ Añadir este horario</button>
-  </div>
-
-  <div class="section-label">Mis franjas añadidas</div>
-  <div id="slots-list"></div>
-</div>
-
-<!-- SCREEN 3: RESULTS -->
-<div class="screen" id="screen-3">
-  <div class="screen-title">Posibles reuniones</div>
-  <div class="screen-desc">Hemos cruzado todos los horarios. Toca una opción para seleccionarla como reunión definitiva.</div>
-
-  <div id="results-list"></div>
-  <div id="advice-section"></div>
-</div>
-
-<!-- SCREEN 4: CONFIRM -->
-<div class="screen" id="screen-4">
-  <div class="screen-title">Reunión confirmada ✓</div>
-  <div class="screen-desc">Añade esta cita a tu calendario o comparte la información con los participantes.</div>
-
-  <div class="card" id="confirm-summary"></div>
-
-  <div class="section-label">Añadir al calendario</div>
-
-  <a id="gcal-link" class="cal-option" href="#" target="_blank" rel="noopener">
-    <div class="cal-logo">📅</div>
-    <div>
-      <div style="font-weight:600;font-size:15px">Google Calendar</div>
-      <div style="font-size:12px;color:var(--c-text-2)">Se abrirá en tu navegador</div>
-    </div>
-    <div style="margin-left:auto;color:var(--c-text-3)">→</div>
-  </a>
-
-  <a id="outlook-link" class="cal-option" href="#" target="_blank" rel="noopener">
-    <div class="cal-logo">🗓️</div>
-    <div>
-      <div style="font-weight:600;font-size:15px">Outlook / Microsoft Calendar</div>
-      <div style="font-size:12px;color:var(--c-text-2)">Se abrirá en tu navegador</div>
-    </div>
-    <div style="margin-left:auto;color:var(--c-text-3)">→</div>
-  </a>
-
-  <button class="btn btn-secondary btn-full mt-20" onclick="copyInfo()">📋 Copiar información</button>
-  <button class="btn btn-secondary btn-full mt-8" onclick="restartApp()">🔄 Nueva reunión</button>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="nav-bar">
-  <button class="btn btn-secondary" id="btn-back" onclick="goBack()" style="display:none">← Atrás</button>
-  <button class="btn btn-primary btn-full" id="btn-next" onclick="goNext()">Siguiente →</button>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal-box">
-    <div style="font-size:17px;font-weight:700;font-family:'Sora',sans-serif;margin-bottom:8px" id="modal-title">Confirmar reunión</div>
-    <div style="font-size:14px;color:var(--c-text-2);margin-bottom:20px;line-height:1.6" id="modal-body"></div>
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-green" style="flex:1" onclick="confirmMeeting()">¡Confirmar!</button>
-    </div>
+    <button class="btn primary" onclick="showResults()">Ver mejores momentos →</button>
+    <button class="btn ghost" style="margin-top:6px" onclick="editMySlots()">✏️ Editar mi disponibilidad</button>
   </div>
 </div>
 
-<div id="toast"></div>
+<!-- RESULTS -->
+<div class="scr" id="s-results">
+  <div class="topbar"><div class="logo">Meeting<span>Point</span></div></div>
+  <div>
+    <button class="back" onclick="goToParticipants()">← Participantes</button>
+    <div class="ph"><div class="ph-title">Mejores <span>momentos</span></div><div class="ph-sub" id="res-sub"></div></div>
+    <div id="confirmed-wrap"></div>
+    <div class="tabs">
+      <div class="tab on" id="tab-rec" onclick="switchTab('rec')">Recomendados</div>
+      <div class="tab" id="tab-all" onclick="switchTab('all')">Todos los momentos</div>
+    </div>
+    <div id="res-list"></div>
+  </div>
+</div>
 
-<script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
-const COLORS = ['#2E6BE6','#1D7A4B','#C47A15','#C03434','#5A3FBD','#0F7B8C','#8C4F0F','#3B6D11'];
-const NAMES = {};
+</div>
+<div class="toast" id="toast"></div>
 
-let state = {
-  users: [],       // [{id,name,color,slots:[{date,from,to,pref}]}]
-  step: 1,
-  currentUserIdx: 0,
-  currentPref: 2,
-  selectedResult: null,
-  results: []
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FB = initializeApp({
+  apiKey:"AIzaSyCXV_LiwTWQHDzmHpYhCFA5k27A9xdFYGY",
+  authDomain:"meeting-point-5386a.firebaseapp.com",
+  projectId:"meeting-point-5386a",
+  storageBucket:"meeting-point-5386a.firebasestorage.app",
+  messagingSenderId:"308191293104",
+  appId:"1:308191293104:web:6a624885dbb0d7102c5575"
+});
+const db = getFirestore(FB);
+
+const COLORS=['#1D9E75','#378ADD','#D4537E','#BA7517','#3C3489','#D85A30','#086e56'];
+const BGS=['#E1F5EE','#E6F1FB','#FBEAF0','#FAEEDA','#EEEDFE','#FAECE7','#c8efe2'];
+const MONTHS_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MONTHS_S=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DAYS_ES=['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+
+let S={id:null,name:null,myName:null,myIdx:null,participants:[],finalMeeting:null,month:new Date().getMonth(),year:new Date().getFullYear(),selDate:null,pref:'high',unsub:null,tab:'rec'};
+
+const $=id=>document.getElementById(id);
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
+const fromMin=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const ini=n=>n.trim().split(' ').map(w=>w[0]||'').join('').substr(0,2).toUpperCase();
+const genId=()=>{const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');};
+
+function toast(msg,ms=2500){const t=$('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),ms);}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function renderSteps(cid,active){
+  const steps=[{k:'slots',l:'Disponibilidad'},{k:'part',l:'Participantes'},{k:'res',l:'Resultados'}];
+  const ai={slots:0,part:1,res:2}[active];
+  $(cid).innerHTML=steps.map((s,i)=>`<div class="step-item ${i<ai?'done':i===ai?'active':''}"><div class="step-dot"></div><span class="step-label">${s.l}</span></div>${i<steps.length-1?'<div class="step-sep"></div>':''}`).join('');
+}
+window.copyCode=function(){navigator.clipboard?.writeText(S.id).then(()=>toast('Código copiado ✓')).catch(()=>{const e=document.createElement('input');e.value=S.id;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);toast('Código copiado ✓');});};
+
+async function saveSession(){await setDoc(doc(db,'sessions',S.id),{name:S.name,participants:S.participants,finalMeeting:S.finalMeeting||null});}
+async function loadSession(id){const s=await getDoc(doc(db,'sessions',id));return s.exists()?s.data():null;}
+function subscribe(){
+  if(S.unsub)S.unsub();
+  S.unsub=onSnapshot(doc(db,'sessions',S.id),snap=>{
+    if(!snap.exists())return;
+    const d=snap.data();
+    S.participants=d.participants||[];
+    S.finalMeeting=d.finalMeeting||null;
+    if($('s-participants').classList.contains('on'))renderParticipants();
+    if($('s-results').classList.contains('on')){refreshResults();}
+  });
+}
+
+window.createSession=async function(){
+  const sn=$('w-sname').value.trim(),un=$('w-uname').value.trim();
+  if(!sn||!un){toast('Rellena todos los campos');return;}
+  S.id=genId();S.name=sn;S.myName=un;S.myIdx=0;S.participants=[{name:un,slots:{}}];S.finalMeeting=null;
+  await saveSession();subscribe();startCalendar();
+};
+window.joinSession=async function(){
+  const code=$('w-code').value.trim().toUpperCase(),un=$('w-jname').value.trim();
+  if(!code||!un){toast('Rellena todos los campos');return;}
+  const data=await loadSession(code);
+  if(!data){toast('Código no encontrado. Revísalo.');return;}
+  S.id=code;S.name=data.name;S.participants=data.participants||[];S.finalMeeting=data.finalMeeting||null;S.myName=un;
+  const ex=S.participants.findIndex(p=>p.name.toLowerCase()===un.toLowerCase());
+  if(ex>=0){S.myIdx=ex;}else{S.myIdx=S.participants.length;S.participants.push({name:un,slots:{}});await saveSession();}
+  subscribe();startCalendar();
 };
 
-// ─── UTILITIES ────────────────────────────────────────────────────────────────
-function uid() { return Math.random().toString(36).slice(2,8); }
-function initials(name) { return name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase(); }
-function toMinutes(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
-function fromMinutes(m) { const h=Math.floor(m/60),mn=m%60; return String(h).padStart(2,'0')+':'+String(mn).padStart(2,'0'); }
-function fmtDate(d) {
-  const parts=d.split('-'); const dt=new Date(+parts[0],+parts[1]-1,+parts[2]);
-  return dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+function startCalendar(){
+  $('cal-title').textContent='Hola, '+S.myName+'!';
+  $('cal-sess-lbl').textContent=S.name;
+  renderSteps('steps-cal','slots');show('s-calendar');renderCal();
 }
-function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2400);
-}
-function avatar(user,size=26) {
-  return `<div class="user-avatar" style="width:${size}px;height:${size}px;background:${user.color}22;color:${user.color}">${initials(user.name)}</div>`;
-}
-
-// ─── STEP NAVIGATION ─────────────────────────────────────────────────────────
-function updateStepper() {
-  for(let i=1;i<=4;i++){
-    const dot=document.getElementById('dot-'+i);
-    const lbl=document.getElementById('lbl-'+i);
-    const con=document.getElementById('con-'+i);
-    dot.className='step-dot'+(i===state.step?' active':i<state.step?' done':'');
-    lbl.className='step-label'+(i===state.step?' active':'');
-    if(con) con.className='step-connector'+(i<state.step?' done':'');
-    if(i===state.step) dot.textContent=i;
-    else if(i<state.step) dot.textContent='✓';
-    else dot.textContent=i;
+window.chMonth=function(d){S.month+=d;if(S.month>11){S.month=0;S.year++;}if(S.month<0){S.month=11;S.year--;}renderCal();};
+function renderCal(){
+  $('cal-lbl').textContent=MONTHS_ES[S.month]+' '+S.year;
+  const dn=$('cal-dn');dn.innerHTML='';
+  ['L','M','X','J','V','S','D'].forEach(d=>{const e=document.createElement('div');e.className='cal-dn';e.textContent=d;dn.appendChild(e);});
+  const grid=$('cal-days');grid.innerHTML='';
+  const first=new Date(S.year,S.month,1).getDay();
+  const offset=first===0?6:first-1;
+  const days=new Date(S.year,S.month+1,0).getDate();
+  const mySlots=S.participants[S.myIdx]?.slots||{};
+  const today=new Date();
+  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='cal-d empty';grid.appendChild(e);}
+  for(let d=1;d<=days;d++){
+    const el=document.createElement('div');
+    const key=S.year+'-'+String(S.month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isPast=new Date(S.year,S.month,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    el.className='cal-d'+(isPast?' past':' curr');
+    el.textContent=d;
+    if(today.getFullYear()===S.year&&today.getMonth()===S.month&&today.getDate()===d)el.classList.add('today');
+    if(S.selDate===key)el.classList.add('sel');
+    if(mySlots[key]?.length>0)el.classList.add('has');
+    if(!isPast)el.onclick=()=>selDay(key,d);
+    grid.appendChild(el);
   }
 }
-
-function showScreen(n) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+n).classList.add('active');
-  document.getElementById('btn-back').style.display=n>1?'':'none';
-  if(n===4) document.getElementById('btn-next').style.display='none';
-  else document.getElementById('btn-next').style.display='';
-  window.scrollTo(0,0);
+function selDay(key,d){
+  S.selDate=key;renderCal();
+  const dow=new Date(S.year,S.month,d).getDay();const dowIdx=dow===0?6:dow-1;
+  $('slots-date-lbl').textContent=DAYS_ES[dowIdx]+', '+d+' de '+MONTHS_S[S.month]+' de '+S.year;
+  $('slots-wrap').style.display='block';renderChips();
 }
-
-function goNext() {
-  if(state.step===1) {
-    if(state.users.length<2){showToast('Añade al menos 2 participantes');return;}
-    state.step=2; state.currentUserIdx=0; renderAvailability();
-  } else if(state.step===2) {
-    const curUser=state.users[state.currentUserIdx];
-    if(curUser.slots.length===0){showToast('Añade al menos un horario para '+curUser.name);return;}
-    if(state.currentUserIdx<state.users.length-1){
-      state.currentUserIdx++; renderAvailability(); return;
-    }
-    state.step=3; computeResults(); renderResults();
-  } else if(state.step===3) {
-    if(!state.selectedResult){showToast('Selecciona una opción de reunión');return;}
-    openModal();
-    return;
-  }
-  updateStepper(); showScreen(state.step);
-}
-
-function goBack() {
-  if(state.step===2 && state.currentUserIdx>0){
-    state.currentUserIdx--; renderAvailability(); return;
-  }
-  state.step=Math.max(1,state.step-1);
-  if(state.step===2){state.currentUserIdx=state.users.length-1;renderAvailability();}
-  updateStepper(); showScreen(state.step);
-}
-
-// ─── SCREEN 1: PARTICIPANTS ───────────────────────────────────────────────────
-function addUser() {
-  const inp=document.getElementById('user-input');
-  const name=inp.value.trim();
-  if(!name){showToast('Escribe un nombre');return;}
-  if(state.users.find(u=>u.name.toLowerCase()===name.toLowerCase())){showToast('Ya está en la lista');return;}
-  if(state.users.length>=8){showToast('Máximo 8 participantes');return;}
-  const user={id:uid(),name,color:COLORS[state.users.length%COLORS.length],slots:[]};
-  state.users.push(user);
-  inp.value='';
-  renderUsersList();
-}
-
-document.getElementById('user-input').addEventListener('keydown',e=>{if(e.key==='Enter')addUser();});
-
-function removeUser(id) {
-  state.users=state.users.filter(u=>u.id!==id);
-  renderUsersList();
-}
-
-function renderUsersList() {
-  const el=document.getElementById('users-list');
-  if(!state.users.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><p>Aún no hay participantes.<br>Añade al menos 2 personas para continuar.</p></div>`;
-    return;
-  }
-  el.innerHTML=state.users.map(u=>`
-    <div class="user-chip">
-      ${avatar(u)}
-      <span>${u.name}</span>
-      <span class="remove-btn" onclick="removeUser('${u.id}')">×</span>
-    </div>`).join('');
-}
-
-// ─── SCREEN 2: AVAILABILITY ───────────────────────────────────────────────────
-let currentPref=2;
-function setPref(v){
-  currentPref=v;
-  document.querySelectorAll('.pref-btn').forEach((b,i)=>{
-    b.className='pref-btn'+(i+1===v?' active-'+(i+1):'');
+window.setPref=function(p){
+  S.pref=p;
+  const map={h:['high','✓ Alta','Alta'],m:['mid','✓ Media','Media'],l:['low','✓ Baja','Baja']};
+  Object.entries(map).forEach(([k,[pref,onLabel,offLabel]])=>{
+    const b=$('pb-'+k);
+    b.className='pb'+(S.pref===pref?' '+(k==='h'?'h':k==='m'?'m':'l'):'');
+    b.textContent=S.pref===pref?onLabel:offLabel;
   });
+};
+window.addSlot=function(){
+  const s=$('t-s').value,e=$('t-e').value;
+  if(!s||!e||toMin(s)>=toMin(e)){toast('La hora de fin debe ser posterior al inicio');return;}
+  const p=S.participants[S.myIdx];if(!p.slots[S.selDate])p.slots[S.selDate]=[];
+  p.slots[S.selDate].push({start:s,end:e,pref:S.pref});
+  renderCal();renderChips();
+};
+window.removeSlot=function(date,idx){S.participants[S.myIdx].slots[date].splice(idx,1);renderCal();renderChips();};
+function renderChips(){
+  const slots=S.participants[S.myIdx]?.slots[S.selDate]||[];
+  const L={high:'Alta',mid:'Media',low:'Baja'};
+  $('chip-list').innerHTML=slots.map((s,i)=>`<span class="chip ${s.pref}">${s.start}–${s.end} · ${L[s.pref]}<button onclick="removeSlot('${S.selDate}',${i})">×</button></span>`).join('');
 }
-setPref(2);
+window.saveAvail=async function(){
+  const total=Object.values(S.participants[S.myIdx]?.slots||{}).reduce((a,b)=>a+b.length,0);
+  if(total===0){toast('Añade al menos una franja antes de continuar');return;}
+  await saveSession();toast('Disponibilidad guardada ✓');goToParticipants();
+};
+window.editMySlots=function(){S.selDate=null;$('slots-wrap').style.display='none';startCalendar();};
 
-function renderAvailability() {
-  const user=state.users[state.currentUserIdx];
-  document.getElementById('current-user-name').textContent=user.name;
-  document.getElementById('slot-user-label').textContent='Franjas de '+user.name;
-  document.getElementById('slot-user-icon').style.background=user.color+'22';
-  document.getElementById('slot-user-icon').style.color=user.color;
-  document.getElementById('slot-user-icon').textContent='📅';
-
-  // progress pills
-  const bar=document.getElementById('user-progress-bar');
-  bar.innerHTML=state.users.map((u,i)=>`
-    <div style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
-      background:${i===state.currentUserIdx?u.color:'var(--c-bg)'};
-      border:1.5px solid ${i===state.currentUserIdx?u.color:'var(--c-border)'};
-      color:${i===state.currentUserIdx?'white':'var(--c-text-2)'};
-      flex-shrink:0;font-size:12px;font-weight:${i===state.currentUserIdx?'600':'400'}">
-      ${avatar({...u,color:i===state.currentUserIdx?'white':u.color})}
-      ${u.name}
-      ${u.slots.length?`<span style="opacity:0.7">${u.slots.length}</span>`:''}
-    </div>`).join('');
-
-  // next btn label
-  const isLast=state.currentUserIdx===state.users.length-1;
-  document.getElementById('btn-next').textContent=isLast?'Ver resultados →':'Siguiente participante →';
-
-  renderSlots(user);
+function goToParticipants(){
+  renderSteps('steps-part','part');
+  $('part-sname').textContent=S.name;$('part-code').textContent=S.id;
+  renderParticipants();show('s-participants');
 }
-
-function addSlot() {
-  const date=document.getElementById('slot-date').value;
-  const from=document.getElementById('slot-from').value;
-  const to=document.getElementById('slot-to').value;
-  if(!date){showToast('Elige una fecha');return;}
-  if(!from||!to){showToast('Indica la hora de inicio y fin');return;}
-  if(toMinutes(from)>=toMinutes(to)){showToast('La hora de fin debe ser posterior al inicio');return;}
-  const user=state.users[state.currentUserIdx];
-  // check overlap with existing
-  for(const s of user.slots){
-    if(s.date===date){
-      const sf=toMinutes(s.from),st=toMinutes(s.to);
-      const nf=toMinutes(from),nt=toMinutes(to);
-      if(nf<st&&nt>sf){showToast('Se solapa con otra franja tuya');return;}
-    }
-  }
-  user.slots.push({id:uid(),date,from,to,pref:currentPref});
-  user.slots.sort((a,b)=>a.date.localeCompare(b.date)||a.from.localeCompare(b.from));
-  renderSlots(user);
-  showToast('Franja añadida ✓');
+window.goToParticipants=goToParticipants;
+function renderParticipants(){
+  $('part-sub').textContent=S.name+' · '+S.participants.length+' participante(s)';
+  $('part-list').innerHTML=S.participants.map((p,i)=>{
+    const slots=Object.values(p.slots||{}).reduce((a,b)=>a+b.length,0);
+    const color=COLORS[i%COLORS.length],bg=BGS[i%BGS.length];
+    const isMe=i===S.myIdx;
+    const badge=slots>0?`<span class="badge ok">${slots} franja(s)</span>`:`<span class="badge pending">Sin rellenar</span>`;
+    const editBtn=isMe?`<button class="btn sm" style="margin-left:4px" onclick="editMySlots()">Editar</button>`:'';
+    return `<div class="p-row"><div class="av" style="background:${bg};color:${color}">${ini(p.name)}</div><div class="p-info"><div class="p-name">${p.name}${isMe?' <span style="font-size:11px;color:var(--text-3)">(tú)</span>':''}</div><div class="p-detail">${slots} franja(s) añadida(s)</div></div>${badge}${editBtn}</div>`;
+  }).join('');
 }
+window.addParticipant=async function(){
+  const name=$('new-p').value.trim();if(!name)return;
+  if(S.participants.find(p=>p.name.toLowerCase()===name.toLowerCase())){toast('Ese nombre ya existe');return;}
+  S.participants.push({name,slots:{}});await saveSession();$('new-p').value='';toast(name+' añadido/a ✓');renderParticipants();
+};
 
-function removeSlot(userId,slotId){
-  const user=state.users.find(u=>u.id===userId);
-  user.slots=user.slots.filter(s=>s.id!==slotId);
-  renderSlots(user);
-}
-
-const prefLabel=['','Puede ser','Me va bien','¡Perfecto!'];
-const prefClass=['','badge-red','badge-amber','badge-green'];
-const prefEmoji=['','😐','🙂','😄'];
-
-function renderSlots(user){
-  const el=document.getElementById('slots-list');
-  if(!user.slots.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📆</div><p>Aún no has añadido franjas para ${user.name}.</p></div>`;
-    return;
-  }
-  el.innerHTML=user.slots.map(s=>`
-    <div class="slot-item">
-      <div class="slot-user-dot" style="background:${user.color}"></div>
-      <div>
-        <div class="slot-time">${s.from} – ${s.to}</div>
-        <div class="slot-date">${fmtDate(s.date)}</div>
-      </div>
-      <div class="slot-pref"><span class="badge ${prefClass[s.pref]}">${prefEmoji[s.pref]} ${prefLabel[s.pref]}</span></div>
-      <span class="remove-btn" onclick="removeSlot('${user.id}','${s.id}')">×</span>
-    </div>`).join('');
-}
-
-// ─── SCREEN 3: COMPUTE RESULTS ────────────────────────────────────────────────
-function computeResults() {
-  // Collect all (date,from,to) windows from all users and find overlaps
-  const allSlots=[];
-  state.users.forEach(user=>{
-    user.slots.forEach(slot=>{
-      allSlots.push({userId:user.id,date:slot.date,from:toMinutes(slot.from),to:toMinutes(slot.to),pref:slot.pref});
+// ── INTERSECTION ENGINE ────────────────────────────────────
+function computeIntersections(){
+  const dateMap={};
+  const PREF_W={high:3,mid:2,low:1};
+  S.participants.forEach((p,pi)=>{
+    Object.entries(p.slots||{}).forEach(([date,slots])=>{
+      if(!dateMap[date])dateMap[date]=[];
+      slots.forEach(s=>dateMap[date].push({pi,s:toMin(s.start),e:toMin(s.end),pref:s.pref}));
     });
   });
-
-  // Group by date
-  const byDate={};
-  allSlots.forEach(s=>{
-    if(!byDate[s.date]) byDate[s.date]=[];
-    byDate[s.date].push(s);
-  });
-
-  const results=[];
-
-  Object.keys(byDate).sort().forEach(date=>{
-    const daySlots=byDate[date];
-    // Find all intersection intervals among all pairs/groups
-    // Collect all unique [from,to] segments from intersections of 2+ users
-    const events=[]; // time points
-    daySlots.forEach(s=>{events.push(s.from);events.push(s.to);});
-    const times=[...new Set(events)].sort((a,b)=>a-b);
-
-    for(let i=0;i<times.length-1;i++){
-      const segStart=times[i], segEnd=times[i+1];
-      if(segEnd-segStart<15) continue; // ignore tiny segments
-
-      const presentSlots=daySlots.filter(s=>s.from<=segStart && s.to>=segEnd);
-      const userIds=[...new Set(presentSlots.map(s=>s.userId))];
-      if(userIds.length<1) continue;
-
-      // Score: weighted by pref and user count
-      const presentUsers=userIds.map(uid=>({
-        user:state.users.find(u=>u.id===uid),
-        pref:Math.max(...presentSlots.filter(s=>s.userId===uid).map(s=>s.pref))
-      }));
-      const avgPref=presentUsers.reduce((a,u)=>a+u.pref,0)/presentUsers.length;
-      const coverRatio=userIds.length/state.users.length;
-      const score=Math.round((coverRatio*0.6 + (avgPref/3)*0.4)*100);
-
-      // Merge contiguous segments (will handle below)
-      results.push({date,from:segStart,to:segEnd,presentUsers,userIds,score,avgPref,coverRatio});
+  const total=S.participants.length;
+  const segments=[];
+  Object.entries(dateMap).forEach(([date,intervals])=>{
+    const bounds=[...new Set(intervals.flatMap(iv=>[iv.s,iv.e]))].sort((a,b)=>a-b);
+    for(let i=0;i<bounds.length-1;i++){
+      const segS=bounds[i],segE=bounds[i+1];
+      if(segS>=segE)continue;
+      const avail=intervals.filter(iv=>iv.s<=segS&&iv.e>=segE);
+      if(!avail.length)continue;
+      const byPi={};
+      avail.forEach(iv=>{if(!byPi[iv.pi]||PREF_W[iv.pref]>PREF_W[byPi[iv.pi].pref])byPi[iv.pi]=iv;});
+      const entries=Object.values(byPi);
+      if(!entries.length)continue;
+      const score=entries.reduce((s,e)=>s+PREF_W[e.pref],0);
+      const pct=Math.round(entries.length/total*100);
+      const avg=score/entries.length;
+      let cat,catLabel,bg,text,badgeBg,badgeText;
+      if(pct===100&&avg>=2.5){cat=5;catLabel='Ideal';bg='#E1F5EE';text='#0F6E56';badgeBg='#1D9E75';badgeText='#fff';}
+      else if(pct>=75&&avg>=2){cat=4;catLabel='Muy bueno';bg='#EAF3DE';text='#27500A';badgeBg='#639922';badgeText='#fff';}
+      else if(pct>=50&&avg>=1.5){cat=3;catLabel='Bueno';bg='#FAEEDA';text='#633806';badgeBg='#EF9F27';badgeText='#fff';}
+      else if(pct>=33){cat=2;catLabel='Regular';bg='#FAECE7';text='#993C1D';badgeBg='#D85A30';badgeText='#fff';}
+      else{cat=1;catLabel='Limitado';bg='#F1EFE8';text='#5F5E5A';badgeBg='#888780';badgeText='#fff';}
+      const absent=S.participants.filter((_,pi2)=>!entries.find(e=>e.pi===pi2));
+      const tips=[];
+      if(absent.length>0&&absent.length<=2)tips.push('absent:Falta(n): '+absent.map(a=>a.name).join(', ')+'. Consulta si pueden ajustar.');
+      if((segE-segS)<60&&entries.length<total)tips.push('advice:Franja corta ('+(segE-segS)+' min). Valora ampliarla.');
+      segments.push({date,start:fromMin(segS),end:fromMin(segE),entries,score,pct,cat,catLabel,bg,text,badgeBg,badgeText,tips,absent,dur:segE-segS});
     }
   });
-
-  // Merge contiguous segments with same user set
+  // Merge consecutive segments with same participants
+  segments.sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
   const merged=[];
-  results.sort((a,b)=>a.date.localeCompare(b.date)||a.from-b.from);
-  for(const r of results){
-    const key=r.userIds.slice().sort().join(',');
+  for(const seg of segments){
     const last=merged[merged.length-1];
-    if(last && last.date===r.date && last.to===r.from && last.userIds.slice().sort().join(',')=== key){
-      last.to=r.to;
-      last.score=Math.max(last.score,r.score);
-    } else {
-      merged.push({...r});
-    }
+    const sameP=last&&last.date===seg.date&&last.end===seg.start&&
+      [...last.entries.map(e=>e.pi)].sort().join()===seg.entries.map(e=>e.pi).sort().join();
+    if(sameP){last.end=seg.end;last.dur+=seg.dur;last.score=Math.max(last.score,seg.score);}
+    else merged.push({...seg,entries:[...seg.entries],absent:[...seg.absent]});
   }
+  return merged.sort((a,b)=>b.cat-a.cat||b.pct-a.pct||b.score-a.score||b.dur-a.dur);
+}
 
-  // Sort by score desc
-  merged.sort((a,b)=>b.score-a.score);
-  state.results=merged;
+let allRes=[];
+window.showResults=function(){
+  allRes=computeIntersections();
+  $('res-sub').textContent=S.participants.length+' participante(s) · '+allRes.length+' franja(s) de coincidencia encontradas';
+  S.tab='rec';$('tab-rec').className='tab on';$('tab-all').className='tab';
+  renderSteps('steps-cal','res');
+  show('s-results');refreshResults();
+};
+function refreshResults(){allRes=computeIntersections();renderConfirmedBox();renderResults();}
+window.switchTab=function(t){S.tab=t;$('tab-rec').className='tab'+(t==='rec'?' on':'');$('tab-all').className='tab'+(t==='all'?' on':'');renderResults();};
+
+function fmtDate(d){
+  const[y,m,dd]=d.split('-');
+  const dow=new Date(parseInt(y),parseInt(m)-1,parseInt(dd)).getDay();
+  const di=dow===0?6:dow-1;
+  return DAYS_ES[di]+', '+dd+' de '+MONTHS_S[parseInt(m)-1]+' '+y;
+}
+function gcUrl(fm){
+  const s=fm.date.replace(/-/g,'')+'T'+fm.start.replace(':','')+'00';
+  const e=fm.date.replace(/-/g,'')+'T'+fm.end.replace(':','')+'00';
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(S.name)}&dates=${s}/${e}&details=${encodeURIComponent('Reunión organizada con MeetingPoint')}`;
+}
+function msUrl(fm){
+  const[y,m,d]=fm.date.split('-');
+  return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(S.name)}&startdt=${encodeURIComponent(y+'-'+m+'-'+d+'T'+fm.start+':00')}&enddt=${encodeURIComponent(y+'-'+m+'-'+d+'T'+fm.end+':00')}&body=${encodeURIComponent('Reunión organizada con MeetingPoint')}`;
+}
+
+function renderConfirmedBox(){
+  const w=$('confirmed-wrap');
+  if(!S.finalMeeting){w.innerHTML='';return;}
+  const fm=S.finalMeeting;
+  w.innerHTML=`<div class="confirmed-box">
+    <div class="confirmed-icon">🎉</div>
+    <div class="confirmed-title">¡Reunión confirmada!</div>
+    <div class="confirmed-dt">${fmtDate(fm.date)}</div>
+    <div class="confirmed-dt" style="font-size:18px;color:var(--green)">${fm.start} – ${fm.end}</div>
+    <div class="confirmed-sub">${fm.attendees} persona(s) · Confirmada por ${fm.by}</div>
+    <div class="cal-btns">
+      <a class="cal-btn" href="${gcUrl(fm)}" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#fff"/><path fill="#1976D2" d="M12 36h24v-4H12z"/><path fill="#EA4335" d="M36 10h-6V6l-4 4-4-4v4h-6a2 2 0 00-2 2v28a2 2 0 002 2h24a2 2 0 002-2V12a2 2 0 00-2-2z"/><path fill="#fff" d="M14 18h20v2H14zm0 4h20v2H14zm0 4h12v2H14z"/></svg>
+        Google Calendar
+      </a>
+      <a class="cal-btn" href="${msUrl(fm)}" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#0078D4"/><rect x="8" y="8" width="14" height="14" fill="#fff"/><rect x="26" y="8" width="14" height="14" fill="#fff" opacity=".7"/><rect x="8" y="26" width="14" height="14" fill="#fff" opacity=".7"/><rect x="26" y="26" width="14" height="14" fill="#fff"/></svg>
+        Outlook
+      </a>
+    </div>
+    <button class="btn ghost sm" style="margin-top:8px;color:var(--text-3)" onclick="unselectMeeting()">Desconfirmar reunión</button>
+  </div>`;
 }
 
 function renderResults(){
-  const el=document.getElementById('results-list');
-  const advEl=document.getElementById('advice-section');
-
-  if(!state.results.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">😔</div><p>No se encontraron momentos de coincidencia.<br>Vuelve atrás y añade más franjas horarias.</p></div>`;
-    advEl.innerHTML='';
+  const list=$('res-list');
+  const filtered=S.tab==='rec'?allRes.filter(r=>r.cat>=3):allRes;
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📅</div>${S.tab==='rec'?'No hay coincidencias con alta disponibilidad aún.<br><small>Prueba "Todos los momentos" o pide a más personas que rellenen su disponibilidad.</small>':'Aún no hay franjas de coincidencia entre participantes.'}</div>`;
     return;
   }
-
-  const best=state.results[0];
-  const maxUsers=Math.max(...state.results.map(r=>r.userIds.length));
-  const allUsers=state.users.length;
-
-  el.innerHTML=state.results.map((r,idx)=>{
-    const isBest=idx===0;
-    const pct=Math.round(r.userIds.length/allUsers*100);
-    const barColor=pct===100?'var(--c-green)':pct>=60?'var(--c-accent)':'var(--c-amber)';
-    const absentUsers=state.users.filter(u=>!r.userIds.includes(u.id));
-
-    return `<div class="result-card${isBest?' best':''}" onclick="selectResult(${idx})" id="res-${idx}">
-      <div style="display:flex;align-items:flex-start;gap:12px">
-        <div class="score-ring">
-          <svg width="56" height="56" viewBox="0 0 56 56">
-            <circle cx="28" cy="28" r="22" fill="none" stroke="var(--c-border)" stroke-width="5"/>
-            <circle cx="28" cy="28" r="22" fill="none" stroke="${barColor}" stroke-width="5"
-              stroke-dasharray="${Math.round(2*Math.PI*22*r.score/100)} ${Math.round(2*Math.PI*22)}"
-              stroke-linecap="round"/>
-          </svg>
-          <div class="score-val" style="color:${barColor}">${r.score}</div>
-        </div>
-        <div style="flex:1">
-          <div class="result-time">${fromMinutes(r.from)} – ${fromMinutes(r.to)}</div>
-          <div class="result-date">${fmtDate(r.date)}</div>
-          <div style="font-size:13px;color:var(--c-text-2);margin-bottom:6px">
-            <b style="color:${barColor}">${r.userIds.length}/${allUsers}</b> personas disponibles
-          </div>
-          <div class="result-bar-wrap"><div class="result-bar" style="width:${pct}%;background:${barColor}"></div></div>
-        </div>
+  list.innerHTML=filtered.map(r=>{
+    const isF=S.finalMeeting&&S.finalMeeting.date===r.date&&S.finalMeeting.start===r.start&&S.finalMeeting.end===r.end;
+    const avs=r.entries.map(e=>{
+      const p=S.participants[e.pi];if(!p)return'';
+      return `<div class="mav" style="background:${BGS[e.pi%BGS.length]};color:${COLORS[e.pi%COLORS.length]}" title="${p.name}">${ini(p.name)}</div>`;
+    }).join('');
+    const dur=r.dur>=60?Math.floor(r.dur/60)+'h'+(r.dur%60>0?' '+r.dur%60+'min':''):r.dur+' min';
+    const absentTip=r.absent.length>0?`<div class="res-tip res-absent-tip">⚠️ Sin disponibilidad: ${r.absent.map(a=>a.name).join(', ')}</div>`:'';
+    const advTip=r.tips.filter(t=>t.startsWith('advice:')).map(t=>`<div class="res-tip res-advice-tip">💡 ${t.replace('advice:','')}</div>`).join('');
+    const confirmBtn=isF
+      ?`<span style="font-size:13px;font-weight:700;color:var(--green)">✓ Confirmada</span>`
+      :`<button class="btn sm outline" onclick="selectMeeting('${r.date}','${r.start}','${r.end}',${r.entries.length})">Confirmar esta →</button>`;
+    const calBtns=isF?`<a class="btn sm" href="${gcUrl({date:r.date,start:r.start,end:r.end})}" target="_blank" style="text-decoration:none;background:var(--bg)">📅 Google</a><a class="btn sm" href="${msUrl({date:r.date,start:r.start,end:r.end})}" target="_blank" style="text-decoration:none;background:var(--bg)">📅 Outlook</a>`:'';
+    return `<div class="res-card${isF?' final-pick':''}">
+      ${isF?'<div class="final-banner">🎉 Reunión confirmada para todos los participantes</div>':''}
+      <div class="res-top" style="background:${r.bg}">
+        <div><div class="res-pct" style="color:${r.text}">${r.pct}%</div><div class="res-count" style="color:${r.text}">${r.entries.length} de ${S.participants.length} personas · ${dur}</div></div>
+        <span class="res-badge" style="background:${r.badgeBg};color:${r.badgeText}">${r.catLabel}</span>
       </div>
-      <div class="result-users">
-        ${r.presentUsers.map(pu=>`
-          <div class="result-user-pill">
-            <div class="dot" style="background:${pu.user.color}"></div>
-            ${pu.user.name}
-            <span>${prefEmoji[pu.pref]}</span>
-          </div>`).join('')}
-        ${absentUsers.map(u=>`
-          <div class="result-user-pill absent-pill">
-            <div class="dot" style="background:${u.color}"></div>
-            ${u.name}
-          </div>`).join('')}
+      <div class="res-body">
+        <div class="res-datetime">${fmtDate(r.date)}</div>
+        <div class="res-overlap">${r.start} – ${r.end}</div>
+        <div class="mini-avs">${avs}</div>
+        ${absentTip}${advTip}
       </div>
+      <div class="res-actions">${confirmBtn}${calBtns}</div>
     </div>`;
   }).join('');
-
-  // Advice
-  let advice='';
-  if(best.userIds.length<allUsers){
-    const absent=state.users.filter(u=>!best.userIds.includes(u.id));
-    const absentNames=absent.map(u=>u.name).join(', ');
-    const absentSlots=absent.flatMap(u=>u.slots);
-    if(absentSlots.length){
-      const closest=absentSlots.filter(s=>s.date===best.date);
-      if(closest.length){
-        const suggestion=closest[0];
-        advice=`<div class="advice-box">💡 <strong>Consejo:</strong> ${absentNames} ${absent.length>1?'tienen':'tiene'} disponibilidad el mismo día (${fmtDate(best.date)}), pero en horario diferente. Si la reunión se mueve a las ${suggestion.from}–${suggestion.to}, podría sumarse. Valora si es viable para el resto.</div>`;
-      } else {
-        const otherDates=[...new Set(absentSlots.map(s=>s.date))];
-        if(otherDates.length){
-          const otherBest=state.results.find(r=>r.userIds.length>best.userIds.length);
-          if(otherBest){
-            advice=`<div class="advice-box">💡 <strong>Consejo:</strong> Si se cambia la reunión a <strong>${fmtDate(otherBest.date)}, ${fromMinutes(otherBest.from)}–${fromMinutes(otherBest.to)}</strong>, podrían asistir <strong>${otherBest.userIds.length} de ${allUsers}</strong> personas (incluida/s ${absentNames}).</div>`;
-          }
-        }
-      }
-    }
-  }
-  advEl.innerHTML=advice;
 }
 
-function selectResult(idx){
-  state.selectedResult=idx;
-  document.querySelectorAll('.result-card').forEach((c,i)=>{
-    c.classList.toggle('selected',i===idx);
-  });
-  document.getElementById('btn-next').textContent='Elegir esta reunión →';
-}
-
-// ─── MODAL & CONFIRM ─────────────────────────────────────────────────────────
-function openModal(){
-  const r=state.results[state.selectedResult];
-  document.getElementById('modal-title').textContent='¿Confirmar esta reunión?';
-  document.getElementById('modal-body').innerHTML=
-    `<b>${fmtDate(r.date)}</b><br>${fromMinutes(r.from)} – ${fromMinutes(r.to)}<br><br>`+
-    `Asistentes confirmados: ${r.presentUsers.map(p=>p.user.name).join(', ')}`;
-  document.getElementById('modal').classList.add('open');
-}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-function confirmMeeting(){
-  closeModal();
-  state.step=4;
-  updateStepper();
-  renderConfirm();
-  showScreen(4);
-}
-
-// ─── SCREEN 4: CONFIRM ───────────────────────────────────────────────────────
-function renderConfirm(){
-  const r=state.results[state.selectedResult];
-  const dateStr=r.date;
-  const title=encodeURIComponent('Reunión grupal (meetPoint)');
-  const start=dateStr.replace(/-/g,'')+'T'+fromMinutes(r.from).replace(':','')+'00';
-  const end=dateStr.replace(/-/g,'')+'T'+fromMinutes(r.to).replace(':','')+'00';
-  const attendees=encodeURIComponent(r.presentUsers.map(p=>p.user.name).join(', '));
-  const gcal=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${encodeURIComponent('Reunión organizada con meetPoint.\nAsistentes: '+r.presentUsers.map(p=>p.user.name).join(', '))}`;
-  const outlook=`https://outlook.office.com/calendar/deeplink/compose?subject=${title}&startdt=${dateStr}T${fromMinutes(r.from)}:00&enddt=${dateStr}T${fromMinutes(r.to)}:00&body=${attendees}`;
-
-  document.getElementById('gcal-link').href=gcal;
-  document.getElementById('outlook-link').href=outlook;
-
-  const allUsers=state.users.length;
-  document.getElementById('confirm-summary').innerHTML=`
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-      <div style="font-size:36px">🎉</div>
-      <div>
-        <div style="font-size:19px;font-weight:700;font-family:'Sora',sans-serif">${fromMinutes(r.from)} – ${fromMinutes(r.to)}</div>
-        <div style="font-size:14px;color:var(--c-text-2)">${fmtDate(r.date)}</div>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div style="font-size:13px;color:var(--c-text-2);margin-bottom:10px">Asistentes confirmados (${r.presentUsers.length}/${allUsers})</div>
-    ${r.presentUsers.map(pu=>`
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        ${avatar(pu.user,30)}
-        <span style="font-size:15px;font-weight:500">${pu.user.name}</span>
-        <span class="badge ${prefClass[pu.pref]}" style="margin-left:auto">${prefEmoji[pu.pref]} ${prefLabel[pu.pref]}</span>
-      </div>`).join('')}
-    ${state.users.filter(u=>!r.userIds.includes(u.id)).length?`
-    <div class="divider"></div>
-    <div style="font-size:13px;color:var(--c-text-3)">No disponibles: ${state.users.filter(u=>!r.userIds.includes(u.id)).map(u=>u.name).join(', ')}</div>`:''}`;
-}
-
-function copyInfo(){
-  const r=state.results[state.selectedResult];
-  const text=`📅 REUNIÓN CONFIRMADA\n${fmtDate(r.date)}\n${fromMinutes(r.from)} – ${fromMinutes(r.to)}\n\nAsistentes: ${r.presentUsers.map(p=>p.user.name).join(', ')}`;
-  navigator.clipboard.writeText(text).then(()=>showToast('Copiado al portapapeles ✓')).catch(()=>showToast('No se pudo copiar'));
-}
-
-function restartApp(){
-  state={users:[],step:1,currentUserIdx:0,currentPref:2,selectedResult:null,results:[]};
-  renderUsersList();
-  updateStepper();
-  showScreen(1);
-  document.getElementById('btn-next').style.display='';
-  document.getElementById('btn-next').textContent='Siguiente →';
-}
-
-// Set today as default date
-const today=new Date();
-const yyyy=today.getFullYear(),mm=String(today.getMonth()+1).padStart(2,'0'),dd=String(today.getDate()).padStart(2,'0');
-document.getElementById('slot-date').value=`${yyyy}-${mm}-${dd}`;
-document.getElementById('slot-date').min=`${yyyy}-${mm}-${dd}`;
+window.selectMeeting=async function(date,start,end,attendees){
+  S.finalMeeting={date,start,end,attendees,by:S.myName};
+  await saveSession();toast('¡Reunión confirmada para todos! 🎉',3000);
+  renderConfirmedBox();renderResults();
+};
+window.unselectMeeting=async function(){
+  S.finalMeeting=null;await saveSession();renderConfirmedBox();renderResults();
+};
 </script>
 </body>
 </html>
