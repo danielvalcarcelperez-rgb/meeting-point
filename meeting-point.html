@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Meeting Point</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -258,11 +260,8 @@ input::placeholder{color:var(--text-3)}
 </div>
 <div class="toast" id="toast"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const FB = initializeApp({
+<script>
+const FB = firebase.initializeApp({
   apiKey:"AIzaSyCXV_LiwTWQHDzmHpYhCFA5k27A9xdFYGY",
   authDomain:"meeting-point-5386a.firebaseapp.com",
   projectId:"meeting-point-5386a",
@@ -270,7 +269,7 @@ const FB = initializeApp({
   messagingSenderId:"308191293104",
   appId:"1:308191293104:web:6a624885dbb0d7102c5575"
 });
-const db = getFirestore(FB);
+const db = firebase.firestore();
 
 const COLORS=['#1D9E75','#378ADD','#D4537E','#BA7517','#3C3489','#D85A30','#086e56'];
 const BGS=['#E1F5EE','#E6F1FB','#FBEAF0','#FAEEDA','#EEEDFE','#FAECE7','#c8efe2'];
@@ -278,7 +277,7 @@ const MONTHS_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agost
 const MONTHS_S=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const DAYS_ES=['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
 
-let S={id:null,name:null,myName:null,myIdx:null,participants:[],finalMeeting:null,month:new Date().getMonth(),year:new Date().getFullYear(),selDate:null,pref:'high',unsub:null,tab:'rec'};
+let S={id:null,name:null,myName:null,myIdx:null,creatorIdx:0,participants:[],finalMeeting:null,month:new Date().getMonth(),year:new Date().getFullYear(),selDate:null,pref:'high',unsub:null,tab:'rec'};
 
 const $=id=>document.getElementById(id);
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
@@ -295,15 +294,16 @@ function renderSteps(cid,active){
 }
 window.copyCode=function(){navigator.clipboard?.writeText(S.id).then(()=>toast('Código copiado ✓')).catch(()=>{const e=document.createElement('input');e.value=S.id;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);toast('Código copiado ✓');});};
 
-async function saveSession(){await setDoc(doc(db,'sessions',S.id),{name:S.name,participants:S.participants,finalMeeting:S.finalMeeting||null});}
-async function loadSession(id){const s=await getDoc(doc(db,'sessions',id));return s.exists()?s.data():null;}
+async function saveSession(){await db.collection('sessions').doc(S.id).set({name:S.name,participants:S.participants,finalMeeting:S.finalMeeting||null,creatorIdx:S.creatorIdx||0});}
+async function loadSession(id){const s=await db.collection('sessions').doc(id).get();return s.exists?s.data():null;}
 function subscribe(){
   if(S.unsub)S.unsub();
-  S.unsub=onSnapshot(doc(db,'sessions',S.id),snap=>{
-    if(!snap.exists())return;
+  S.unsub=db.collection('sessions').doc(S.id).onSnapshot(snap=>{
+    if(!snap.exists)return;
     const d=snap.data();
     S.participants=d.participants||[];
     S.finalMeeting=d.finalMeeting||null;
+    S.creatorIdx=d.creatorIdx||0;
     if($('s-participants').classList.contains('on'))renderParticipants();
     if($('s-results').classList.contains('on')){refreshResults();}
   });
@@ -312,7 +312,7 @@ function subscribe(){
 window.createSession=async function(){
   const sn=$('w-sname').value.trim(),un=$('w-uname').value.trim();
   if(!sn||!un){toast('Rellena todos los campos');return;}
-  S.id=genId();S.name=sn;S.myName=un;S.myIdx=0;S.participants=[{name:un,slots:{}}];S.finalMeeting=null;
+  S.id=genId();S.name=sn;S.myName=un;S.myIdx=0;S.creatorIdx=0;S.participants=[{name:un,slots:{}}];S.finalMeeting=null;
   await saveSession();subscribe();startCalendar();
 };
 window.joinSession=async function(){
@@ -320,7 +320,7 @@ window.joinSession=async function(){
   if(!code||!un){toast('Rellena todos los campos');return;}
   const data=await loadSession(code);
   if(!data){toast('Código no encontrado. Revísalo.');return;}
-  S.id=code;S.name=data.name;S.participants=data.participants||[];S.finalMeeting=data.finalMeeting||null;S.myName=un;
+  S.id=code;S.name=data.name;S.participants=data.participants||[];S.finalMeeting=data.finalMeeting||null;S.creatorIdx=data.creatorIdx||0;S.myName=un;
   const ex=S.participants.findIndex(p=>p.name.toLowerCase()===un.toLowerCase());
   if(ex>=0){S.myIdx=ex;}else{S.myIdx=S.participants.length;S.participants.push({name:un,slots:{}});await saveSession();}
   subscribe();startCalendar();
@@ -404,9 +404,32 @@ function renderParticipants(){
     const color=COLORS[i%COLORS.length],bg=BGS[i%BGS.length];
     const isMe=i===S.myIdx;
     const badge=slots>0?`<span class="badge ok">${slots} franja(s)</span>`:`<span class="badge pending">Sin rellenar</span>`;
+    const isCreator=S.myIdx===S.creatorIdx;
+    const canDelete=isMe||(isCreator&&i!==S.myIdx);
     const editBtn=isMe?`<button class="btn sm" style="margin-left:4px" onclick="editMySlots()">Editar</button>`:'';
-    return `<div class="p-row"><div class="av" style="background:${bg};color:${color}">${ini(p.name)}</div><div class="p-info"><div class="p-name">${p.name}${isMe?' <span style="font-size:11px;color:var(--text-3)">(tú)</span>':''}</div><div class="p-detail">${slots} franja(s) añadida(s)</div></div>${badge}${editBtn}</div>`;
+    const delBtn=canDelete?`<button class="btn sm" style="margin-left:4px;color:var(--red);border-color:var(--red-l);background:var(--red-l)" onclick="removeParticipant(${i})" title="${isMe?'Salir de la reunión':'Eliminar participante'}">✕</button>`:'';
+    return `<div class="p-row"><div class="av" style="background:${bg};color:${color}">${ini(p.name)}</div><div class="p-info"><div class="p-name">${p.name}${isMe?' <span style="font-size:11px;color:var(--text-3)">(tú)</span>':''}</div><div class="p-detail">${slots} franja(s) añadida(s)</div></div>${badge}${editBtn}${delBtn}</div>`;
   }).join('');
+}
+window.removeParticipant=async function(idx){
+  const p=S.participants[idx];
+  const isMe=idx===S.myIdx;
+  const msg=isMe?`¿Salir de la reunión "${S.name}"? Se eliminarán tus franjas horarias.`:`¿Eliminar a ${p.name}? Se borrarán también sus franjas horarias.`;
+  if(!confirm(msg))return;
+  S.participants.splice(idx,1);
+  // Recalculate myIdx and creatorIdx after removal
+  if(isMe){
+    // User left: go back to welcome
+    await saveSession();
+    S.unsub&&S.unsub();
+    Object.assign(S,{id:null,name:null,myName:null,myIdx:null,creatorIdx:0,participants:[],finalMeeting:null,selDate:null,unsub:null});
+    show('s-welcome');toast('Has salido de la reunión');return;
+  }
+  if(idx<S.myIdx)S.myIdx--;
+  if(idx<S.creatorIdx)S.creatorIdx--;
+  await saveSession();
+  toast(p.name+' eliminado/a ✓');
+  renderParticipants();
 }
 window.addParticipant=async function(){
   const name=$('new-p').value.trim();if(!name)return;
