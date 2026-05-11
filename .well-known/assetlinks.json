@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.danielvalcarcelperez_rgb.twa",
+        "sha256_cert_fingerprints": ["4D:BE:0B:0D:10:51:E8:66:6B:A3:E3:16:28:24:83:E2:4B:5F:B9:0A:03:15:24:84:D0:A8:BD:54:3B:D3:98:3A"]
+      }
+    }]
